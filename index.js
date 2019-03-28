@@ -57,6 +57,7 @@ const oneHandedWeapons = [
   168, // Alucart Sword
 ]
 
+// Currently unused
 const twoHandedWeapons = [
   17, // Sword of Dawn
   21, // Nunchaku
@@ -189,24 +190,71 @@ const accessories = [
   257, // Secret Boots
 ]
 
-const equipmentAddresses = {
-  rightHand: 0x801001a8 + 3,
-  leftHand: 0x801001b4 + 3,
-  helmet: 0x801001c0 + 3,
-  armor: 0x801001cc + 3,
-  cloak: 0x801001d8 + 3,
-  accessory: 0x801001e4 + 3,
-}
+const equipBaseAddress = 0x11a0d0
 
 function randItem(array) {
   return array[Math.floor(Math.random() * array.length)]
 }
 
 function randomizeEquipment(data) {
-  data[equipmentAddresses.rightHand] = randItem(oneHandedWeapons)
-  data[equipmentAddresses.leftHand] = randItem(shields)
-  data[equipmentAddresses.helmet] = randItem(helmets)
-  data[equipmentAddresses.armor] = randItem(armors)
-  data[equipmentAddresses.cloak] = randItem(cloaks)
-  data[equipmentAddresses.accessory] = randItem(accessories)
+  // Random item ids
+  const swordId = randItem(oneHandedWeapons)
+  const shieldId = randItem(shields)
+  const helmetId = randItem(helmets)
+  const armorId = randItem(armors)
+  const cloakId = randItem(cloaks)
+  const accessoryId = randItem(accessories)
+  // Their values when equipped
+  const swordEquipVal = swordId
+  const shieldEquipVal = shieldId
+  const helmetEquipVal = 27 + helmetId - helmets[0]
+  const armorEquipVal = 1 + armorId - armors[0]
+  const cloakEquipVal = 49 + cloakId - cloaks[0]
+  const accessoryEquipVal = 58 + accessoryId - accessories[0]
+  // Their inventory locations
+  const swordInvOffset = swordId + 0x798a
+  const shieldInvOffset = shieldId + 0x798a
+  const helmetInvOffset = helmetId + 0x798a
+  const armorInvOffset = armorId + 0x798a
+  const cloakInvOffset = cloakId + 0x798a
+  const accessoryInvOffset = accessoryId + 0x798a
+  // Equip the items
+  data[equipBaseAddress +  0] = swordEquipVal
+  data[equipBaseAddress + 12] = shieldEquipVal
+  data[equipBaseAddress + 24] = helmetEquipVal
+  data[equipBaseAddress + 36] = armorEquipVal
+  data[equipBaseAddress + 48] = cloakEquipVal
+  data[equipBaseAddress + 60] = accessoryEquipVal
+  // Death removes these values if equipped
+  data[0x1195f8] = swordEquipVal
+  data[0x119658] = shieldEquipVal
+  data[0x1196b8] = helmetEquipVal
+  data[0x1196f4] = armorEquipVal
+  data[0x119730] = cloakEquipVal
+  data[0x119774] = accessoryEquipVal
+  // Death decrements these inventory values if not equipeed
+  data[0x119634 + 0] = swordInvOffset & 0xff
+  data[0x119634 + 1] = swordInvOffset >>> 8
+  data[0x119648 + 0] = swordInvOffset & 0xff
+  data[0x119648 + 1] = swordInvOffset >>> 8
+  data[0x119694 + 0] = shieldInvOffset & 0xff
+  data[0x119694 + 1] = shieldInvOffset >>> 8
+  data[0x1196a8 + 0] = shieldInvOffset & 0xff
+  data[0x1196a8 + 1] = shieldInvOffset >>> 8
+  data[0x1196d0 + 0] = helmetInvOffset & 0xff
+  data[0x1196d0 + 1] = helmetInvOffset >>> 8
+  data[0x1196e4 + 0] = helmetInvOffset & 0xff
+  data[0x1196e4 + 1] = helmetInvOffset >>> 8
+  data[0x11970c + 0] = armorInvOffset & 0xff
+  data[0x11970c + 1] = armorInvOffset >>> 8
+  data[0x119720 + 0] = armorInvOffset & 0xff
+  data[0x119720 + 1] = armorInvOffset >>> 8
+  data[0x119750 + 0] = cloakInvOffset & 0xff
+  data[0x119750 + 1] = cloakInvOffset >>> 8
+  data[0x119764 + 0] = cloakInvOffset & 0xff
+  data[0x119764 + 1] = cloakInvOffset >>> 8
+  data[0x1197b0 + 0] = accessoryInvOffset & 0xff
+  data[0x1197b0 + 1] = accessoryInvOffset >>> 8
+  data[0x1197c4 + 0] = accessoryInvOffset & 0xff
+  data[0x1197c4 + 1] = accessoryInvOffset >>> 8
 }
