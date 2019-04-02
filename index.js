@@ -18,23 +18,23 @@ const shopIdOffset = -0xa9
 
 // Equipment list.
 // Note that some items are disabled for various reasons.
-// For instance, they be drop-only, or required for progression.
+// For instance, they may be drop-only, or required for progression.
 const equipment = [{
   name: 'Shield Rod',
   type: TYPE_WEAPON1,
   id: 4,
-  tileAddress: 0x43c3132,
+  tileAddresses: [ 0x43c3132 ],
 }, {
   name: 'Leather Shield',
   type: TYPE_SHIELD,
   id: 5,
-  tileAddress: 0x54b22a8,
+  tileAddresses: [ 0x54b22a8 ],
   shopAddress: 0x47a3166,
 }, {
   name: 'Knight Shield',
   type: TYPE_SHIELD,
   id: 6,
-  tileAddress: 0x43c3138,
+  tileAddresses: [ 0x43c3138 ],
 }, {
   name: 'Iron Shield',
   type: TYPE_SHIELD,
@@ -49,7 +49,7 @@ const equipment = [{
   name: 'Herald Shield',
   type: TYPE_SHIELD,
   id: 9,
-  tileAddress: 0x4c324ae, // 0x61a73b2 ?
+  tileAddresses: [ 0x4c324ae, 0x61a73b2 ],
 }, {
   name: 'Dark Shield',
   type: TYPE_SHIELD,
@@ -59,12 +59,12 @@ const equipment = [{
   name: 'Goddess Shield',
   type: TYPE_SHIELD,
   id: 11,
-  tileAddress: 0x5903076,
+  tileAddresses: [ 0x5903076 ],
 }, {
   name: 'Shaman Shield',
   type: TYPE_SHIELD,
   id: 12,
-  tileAddress: 0x5573846,
+  tileAddresses: [ 0x5573844 ],
 }, {
   name: 'Medusa Shield',
   type: TYPE_SHIELD,
@@ -84,17 +84,17 @@ const equipment = [{
   name: 'Alucard Shield',
   type: TYPE_SHIELD,
   id: 16,
-  tileAddress: 0x526c0e8,
+  tileAddresses: [ 0x526c0e8 ],
 }, {
   name: 'Sword of Dawn',
   type: TYPE_WEAPON2,
   id: 17,
-  tileAddress: 0x57e0160,
+  tileAddresses: [ 0x57e0160 ],
 }, {
   name: 'Basilard',
   type: TYPE_WEAPON1,
   id: 18,
-  tileAddress: 0x54b22aa,
+  tileAddresses: [ 0x54b22aa ],
 }, {
   name: 'Short Sword',
   type: TYPE_WEAPON1,
@@ -104,12 +104,12 @@ const equipment = [{
   name: 'Combat Knife',
   type: TYPE_WEAPON1,
   id: 20,
-  tileAddress: 0x45e9606,
+  tileAddresses: [ 0x45e9606 ],
 }, {
   name: 'Nunchaku',
   type: TYPE_WEAPON2,
   id: 21,
-  tileAddress: 0x4c324e8,
+  tileAddresses: [ 0x4c324e8 ],
 }, {
   name: 'Were Bane',
   type: TYPE_WEAPON1,
@@ -129,17 +129,17 @@ const equipment = [{
   name: 'Takemitsu',
   type: TYPE_WEAPON2,
   id: 27,
-  tileAddress: 0x47a3912,
+  tileAddresses: [ 0x47a3912 ],
 }, {
   name: 'Shotel',
   type: TYPE_WEAPON1,
   id: 28,
-  tileAddress: 0x505016e,
+  tileAddresses: [ 0x505016e ],
 }, {
   name: 'Tyrfing',
   type: TYPE_WEAPON1,
   id: 83,
-  tileAddress: 0x560f5fe,
+  tileAddresses: [ 0x560f5fe ],
 }, {
   name: 'Namakura',
   type: TYPE_WEAPON2,
@@ -149,22 +149,22 @@ const equipment = [{
   name: 'Knuckle Duster',
   type: TYPE_WEAPON1,
   id: 85,
-  tileAddress: 0x4c324ce, // 0x61a73d2 ?
+  tileAddresses: [ 0x4c324ce, 0x61a73d2 ],
 }, {
   name: 'Gladius',
   type: TYPE_WEAPON1,
   id: 86,
-  tileAddress: 0x49d367c,
+  tileAddresses: [ 0x49d367c ],
 }, {
   name: 'Scimitar',
   type: TYPE_WEAPON1,
   id: 87,
-  tileAddress: 0x4c324c6, // 0x61a73ca ?
+  tileAddresses: [ 0x4c324c6, 0x61a73ca ],
 }, {
   name: 'Cutlass',
   type: TYPE_WEAPON1,
   id: 88,
-  tileAddress: 0x4676f14,
+  tileAddresses: [ 0x4676f14 ],
 }, {
   name: 'Saber',
   type: TYPE_WEAPON1,
@@ -174,17 +174,17 @@ const equipment = [{
   name: 'Falchion',
   type: TYPE_WEAPON1,
   id: 90,
-  tileAddress: 0x560f610,
+  tileAddresses: [ 0x560f610 ],
 }, {
   name: 'Broadsword',
   type: TYPE_WEAPON1,
   id: 91,
-  tileAddress: 0x4aa155c,
+  tileAddresses: [ 0x4aa155c ],
 }, {
   name: 'Bekatowa',
   type: TYPE_WEAPON1,
   id: 92,
-  tileAddress: 0x5573842,
+  tileAddresses: [ 0x5573842 ],
 }, {
   name: 'Damascus Sword',
   type: TYPE_WEAPON1,
@@ -199,32 +199,32 @@ const equipment = [{
   name: 'Estoc',
   type: TYPE_WEAPON2,
   id: 95,
-  tileAddress: 0x4aa1698,
+  tileAddresses: [ 0x4aa1698 ],
 }, {
   name: 'Bastard Sword',
   type: TYPE_WEAPON1,
   id: 96,
-  tileAddress: 0x57e0168,
+  tileAddresses: [ 0x57e0168 ],
 }, {
   name: 'Jewel Knuckles',
   type: TYPE_WEAPON1,
   id: 97,
-  tileAddress: 0x49d3674,
+  tileAddresses: [ 0x49d3674 ],
 }, {
   name: 'Claymore',
   type: TYPE_WEAPON2,
   id: 98,
-  tileAddress: 0x4c324ba, // 0x61a73be ?
+  tileAddresses: [ 0x4c324ba, 0x61a73be ],
 }, {
   name: 'Talwar',
   type: TYPE_WEAPON1,
   id: 99,
-  tileAddress: 0x4e322ce,
+  tileAddresses: [ 0x4e322ce ],
 }, {
   name: 'Katana',
   id: 100,
   type: TYPE_WEAPON2,
-  tileAddress: 0x590307a,
+  tileAddresses: [ 0x590307a ],
 }, {
   name: 'Flamberge',
   type: TYPE_WEAPON2,
@@ -244,12 +244,12 @@ const equipment = [{
   name: 'Sword of Hador',
   type: TYPE_WEAPON1,
   id: 104,
-  tileAddress: 0x50f87ba,
+  tileAddresses: [ 0x50f87ba ],
 }, {
   name: 'Luminus',
   type: TYPE_WEAPON1,
   id: 105,
-  tileAddress: 0x59bc0d6,
+  tileAddresses: [ 0x59bc0d6 ],
 }, {
   name: 'Harper',
   type: TYPE_WEAPON1,
@@ -264,17 +264,17 @@ const equipment = [{
   name: 'Gram',
   type: TYPE_WEAPON1,
   id: 108,
-  tileAddress: 0x575155a,
+  tileAddresses: [ 0x575155a ],
 }, {
   name: 'Jewel Sword',
   type: TYPE_WEAPON1,
   id: 109,
-  tileAddress: 0x4b68612, // 0x53f5f8e ?
+  tileAddresses: [ 0x4b68616, 0x53f5f92 ],
 }, {
   name: 'Mormegil',
   type: TYPE_WEAPON1,
   id: 110,
-  tileAddress: 0x44912ea,
+  tileAddresses: [ 0x44912ea ],
 }, {
   name: 'Firebrand',
   type: TYPE_WEAPON1,
@@ -289,7 +289,7 @@ const equipment = [{
   name: 'Icebrand',
   type: TYPE_WEAPON1,
   id: 113,
-  tileAddress: 0x44912e6,
+  tileAddresses: [ 0x44912e6 ],
   shopAddress: 0x47a314e,
 }, {
   name: 'Stone Sword',
@@ -300,7 +300,7 @@ const equipment = [{
   name: 'Holy Sword',
   type: TYPE_WEAPON1,
   id: 115,
-  tileAddress: 0x43c313e,
+  tileAddresses: [ 0x43c313e ],
 }, {
   name: 'Terminus Est',
   type: TYPE_WEAPON1,
@@ -315,7 +315,7 @@ const equipment = [{
   name: 'Dark Blade',
   type: TYPE_WEAPON1,
   id: 118,
-  tileAddress: 0x526c116,
+  tileAddresses: [ 0x526c116 ],
 }, {
   name: 'Heaven Sword',
   type: TYPE_WEAPON1,
@@ -340,7 +340,7 @@ const equipment = [{
   name: 'Alucard Sword',
   type: TYPE_WEAPON1,
   id: 123,
-  tileAddress: 0x4da5138,
+  tileAddresses: [ 0x4da5138 ],
 }, {
   name: 'Mablung Sword',
   type: TYPE_WEAPON1,
@@ -350,7 +350,7 @@ const equipment = [{
   name: 'Badelaire',
   type: TYPE_WEAPON1,
   id: 125,
-  tileAddress: 0x4ee2f1e,
+  tileAddresses: [ 0x4ee2f1e ],
 }, {
   name: 'Sword Familiar',
   type: TYPE_WEAPON1,
@@ -365,22 +365,22 @@ const equipment = [{
   name: 'Morning Star',
   type: TYPE_WEAPON1,
   id: 129,
-  tileAddress: 0x4676efa,
+  tileAddresses: [ 0x4676efa ],
 }, {
   name: 'Holy Rod',
   type: TYPE_WEAPON1,
   id: 130,
-  tileAddress: 0x47a390c,
+  tileAddresses: [ 0x47a390c ],
 }, {
   name: 'Star Flail',
   type: TYPE_WEAPON1,
   id: 131,
-  tileAddress: 0x557383a,
+  tileAddresses: [ 0x557383a ],
 }, {
   name: 'Moon Rod',
   type: TYPE_WEAPON1,
   id: 132,
-  tileAddress: 0x59bc0e6,
+  tileAddresses: [ 0x59bc0e6 ],
 }, {
   name: 'Chakram',
   type: TYPE_WEAPON1,
@@ -400,7 +400,7 @@ const equipment = [{
   name: 'Osafune Katana',
   type: TYPE_WEAPON2,
   id: 139,
-  tileAddress: 0x526c11c,
+  tileAddresses: [ 0x526c11c ],
 }, {
   name: 'Masamune',
   type: TYPE_WEAPON2,
@@ -435,12 +435,12 @@ const equipment = [{
   name: 'Alucart Shield',
   type: TYPE_SHIELD,
   id: 167,
-  tileAddress: 0x48fad9a,
+  tileAddresses: [ 0x48fad9a ],
 }, {
   name: 'Alucart Sword',
   type: TYPE_WEAPON1,
   id: 168,
-  tileAddress: 0x48fada6,
+  tileAddresses: [ 0x48fada6 ],
 }, {
   name: 'Cloth Tunic',
   type: TYPE_ARMOR,
@@ -450,12 +450,12 @@ const equipment = [{
   name: 'Hide cuirass',
   type: TYPE_ARMOR,
   id: 171,
-  tileAddress: 0x54b2298,
+  tileAddresses: [ 0x54b2298 ],
 }, {
   name: 'Bronze Cuirass',
   type: TYPE_ARMOR,
   id: 172,
-  tileAddress: 0x47a3910,
+  tileAddresses: [ 0x47a3910 ],
 }, {
   name: 'Iron Cuirass',
   type: TYPE_ARMOR,
@@ -470,17 +470,17 @@ const equipment = [{
   name: 'Silver Plate',
   type: TYPE_ARMOR,
   id: 175,
-  tileAddress: 0x4676f0c,
+  tileAddresses: [ 0x4676f0c ],
 }, {
   name: 'Gold Plate',
   type: TYPE_ARMOR,
   id: 176,
-  tileAddress: 0x557383c,
+  tileAddresses: [ 0x557383c ],
 }, {
   name: 'Platinum Mail',
   type: TYPE_ARMOR,
   id: 177,
-  tileAddress: 0x560f60e,
+  tileAddresses: [ 0x560f60e ],
 }, {
   name: 'Diamond Plate',
   type: TYPE_ARMOR,
@@ -490,22 +490,22 @@ const equipment = [{
   name: 'Fire Mail',
   type: TYPE_ARMOR,
   id: 179,
-  tileAddress: 0x560f5fc,
+  tileAddresses: [ 0x560f5fc ],
 }, {
   name: 'Lightning Mail',
   type: TYPE_ARMOR,
   id: 180,
-  tileAddress: 0x57e018e,
+  tileAddresses: [ 0x57e018e ],
 }, {
   name: 'Ice Mail',
   type: TYPE_ARMOR,
   id: 181,
-  tileAddress: 0x5573848,
+  tileAddresses: [ 0x5573846 ],
 }, {
   name: 'Mirror Cuirass',
   type: TYPE_ARMOR,
   id: 182,
-  tileAddress: 0x49d3676,
+  tileAddresses: [ 0x49d3676 ],
 }, {
   name: 'Spike Breaker',
   type: TYPE_ARMOR,
@@ -515,7 +515,7 @@ const equipment = [{
   name: 'Alucard Mail',
   type: TYPE_ARMOR,
   id: 184,
-  tileAddress: 0x50f87c6,
+  tileAddresses: [ 0x50f87c6 ],
 }, {
   name: 'Dark Armor',
   type: TYPE_ARMOR,
@@ -525,17 +525,17 @@ const equipment = [{
   name: 'Healing Mail',
   type: TYPE_ARMOR,
   id: 186,
-  tileAddress: 0x5573840,
+  tileAddresses: [ 0x5573840 ],
 }, {
   name: 'Holy Mail',
   type: TYPE_ARMOR,
   id: 187,
-  tileAddress: 0x4b6860e, // 0x53f5f8a ?
+  tileAddresses: [ 0x4b6860e, 0x53f5f8a ],
 }, {
   name: 'Walk Armor',
   type: TYPE_ARMOR,
   id: 188,
-  tileAddress: 0x44912e8,
+  tileAddresses: [ 0x44912e8 ],
 }, {
   name: 'Brilliant Mail',
   type: TYPE_ARMOR,
@@ -550,7 +550,7 @@ const equipment = [{
   name: 'Fury Plate',
   type: TYPE_ARMOR,
   id: 191,
-  tileAddress: 0x5751554,
+  tileAddresses: [ 0x5751554 ],
 }, {
   name: 'Dracula Tunic',
   type: TYPE_ARMOR,
@@ -570,17 +570,17 @@ const equipment = [{
   name: 'Sunglasses',
   type: TYPE_HELMET,
   id: 196,
-  tileAddress: 0x54b22a4,
+  tileAddresses: [ 0x54b22a4 ],
 }, {
   name: 'Ballroom Mask',
   type: TYPE_HELMET,
   id: 197,
-  tileAddress: 0x44912f2,
+  tileAddresses: [ 0x44912f2 ],
 }, {
   name: 'Bandanna',
   type: TYPE_HELMET,
   id: 198,
-  tileAddress: 0x4c324b6, // 0x61a738a ?
+  tileAddresses: [ 0x4c324b6, 0x61a738a ],
 }, {
   name: 'Felt Hat',
   type: TYPE_HELMET,
@@ -595,7 +595,7 @@ const equipment = [{
   name: 'Goggles',
   type: TYPE_HELMET,
   id: 201,
-  tileAddress: 0x4676f0a,
+  tileAddresses: [ 0x4676f0a ],
 }, {
   name: 'Leather Hat',
   type: TYPE_HELMET,
@@ -610,12 +610,12 @@ const equipment = [{
   name: 'Steel Helm',
   type: TYPE_HELMET,
   id: 204,
-  tileAddress: 0x557383e,
+  tileAddresses: [ 0x557383e ],
 }, {
   name: 'Stone Mask',
   type: TYPE_HELMET,
   id: 205,
-  tileAddress: 0x47a390a,
+  tileAddresses: [ 0x47a390a ],
 }, {
   name: 'Circlet',
   type: TYPE_HELMET,
@@ -630,7 +630,7 @@ const equipment = [{
   name: 'Ruby Circlet',
   type: TYPE_HELMET,
   id: 208,
-  tileAddress: 0x4cfb702,
+  tileAddresses: [ 0x4cfb702 ],
 }, {
   name: 'Opal Circlet',
   type: TYPE_HELMET,
@@ -640,17 +640,17 @@ const equipment = [{
   name: 'Topaz Circlet',
   type: TYPE_HELMET,
   id: 210,
-  tileAddress: 0x47a391c,
+  tileAddresses: [ 0x47a391c ],
 }, {
   name: 'Beryl Circlet',
   type: TYPE_HELMET,
   id: 211,
-  tileAddress: 0x51ad7a4,
+  tileAddresses: [ 0x51ad7a4 ],
 }, {
   name: 'Cat-eye Circlet',
   type: TYPE_HELMET,
   id: 212,
-  tileAddress: 0x44912e4,
+  tileAddresses: [ 0x44912e4 ],
 }, {
   name: 'Coral Circlet',
   type: TYPE_HELMET,
@@ -660,7 +660,7 @@ const equipment = [{
   name: 'Dragon Helm',
   type: TYPE_HELMET,
   id: 214,
-  tileAddress: 0x59bc0da,
+  tileAddresses: [ 0x59bc0da ],
 }, {
   name: 'Silver Crown',
   type: TYPE_HELMET,
@@ -675,7 +675,7 @@ const equipment = [{
   name: 'Cloth Cape',
   type: TYPE_CLOAK,
   id: 218,
-  tileAddress: 0x54b229c,
+  tileAddresses: [ 0x54b229c ],
 }, {
   name: 'Reverse Cloak',
   type: TYPE_CLOAK,
@@ -690,17 +690,17 @@ const equipment = [{
   name: 'Crystal Cloak',
   type: TYPE_CLOAK,
   id: 221,
-  tileAddress: 0x4c324a4, // 0x61a73a8 ?
+  tileAddresses: [ 0x4c324a4, 0x61a73a8 ],
 }, {
   name: 'Royal Cloak',
   type: TYPE_CLOAK,
   id: 222,
-  tileAddress: 0x57e0176,
+  tileAddresses: [ 0x57e0176 ],
 }, {
   name: 'Blood Cloak',
   type: TYPE_CLOAK,
   id: 223,
-  tileAddress: 0x43c3136,
+  tileAddresses: [ 0x43c3136 ],
 }, {
   name: 'Joseph\'s Cloak',
   type: TYPE_CLOAK,
@@ -710,27 +710,27 @@ const equipment = [{
   name: 'Twilight Cloak',
   type: TYPE_CLOAK,
   id: 225,
-  tileAddress: 0x4e322d4,
+  tileAddresses: [ 0x4e322d4 ],
 }, {
   name: 'Moonstone',
   type: TYPE_OTHER,
   id: 227,
-  tileAddress: 0x4c324c4, // 0x61a73c8 ?
+  tileAddresses: [ 0x4c324c4, 0x61a73c8 ],
 }, {
   name: 'Sunstone',
   type: TYPE_OTHER,
   id: 228,
-  tileAddress: 0x59bc0e0,
+  tileAddresses: [ 0x59bc0e0 ],
 }, {
   name: 'Bloodstone',
   type: TYPE_OTHER,
   id: 229,
-  tileAddress: 0x44912f4,
+  tileAddresses: [ 0x44912f4 ],
 }, {
   name: 'Staurolite',
   type: TYPE_OTHER,
   id: 230,
-  tileAddress: 0x4ee2f20,
+  tileAddresses: [ 0x4ee2f20 ],
 }, {
   name: 'Ring of Pales',
   type: TYPE_OTHER,
@@ -780,7 +780,7 @@ const equipment = [{
   name: 'Ring of Ares',
   type: TYPE_OTHER,
   id: 240,
-  tileAddress: 0x45e9604,
+  tileAddresses: [ 0x45e9604 ],
 }, {
   name: 'Gold Ring',
   type: TYPE_OTHER,
@@ -800,12 +800,12 @@ const equipment = [{
   name: 'Ring of Arcana',
   type: TYPE_OTHER,
   id: 244,
-  tileAddress: 0x5903080,
+  tileAddresses: [ 0x5903080 ],
 }, {
   name: 'Mystic Pendant',
   type: TYPE_OTHER,
   id: 245,
-  tileAddress: 0x4676f00,
+  tileAddresses: [ 0x4676f00 ],
 }, {
   name: 'Heart Broach',
   type: TYPE_OTHER,
@@ -815,7 +815,7 @@ const equipment = [{
   name: 'Necklace of J',
   type: TYPE_OTHER,
   id: 247,
-  tileAddress: 0x4cfb6fa,
+  tileAddresses: [ 0x4cfb6fa ],
 }, {
   name: 'Gauntlet',
   type: TYPE_OTHER,
@@ -825,7 +825,7 @@ const equipment = [{
   name: 'Ankh of Life',
   type: TYPE_OTHER,
   id: 249,
-  tileAddress: 0x4676ef8,
+  tileAddresses: [ 0x4676ef8 ],
 }, {
   name: 'Ring of Feanor',
   type: TYPE_OTHER,
@@ -840,7 +840,7 @@ const equipment = [{
   name: 'Talisman',
   type: TYPE_OTHER,
   id: 252,
-  tileAddress: 0x51ad7aa,
+  tileAddresses: [ 0x51ad7aa ],
 }, {
   name: 'Duplicator',
   type: TYPE_OTHER,
@@ -865,12 +865,12 @@ const equipment = [{
   name: 'Secret Boots',
   type: TYPE_OTHER,
   id: 257,
-  tileAddress: 0x4c324de, // 0x61a73e2 ?
+  tileAddresses: [ 0x4c324de, 0x61a73e2 ],
 }, {
   name: 'Alucart Mail',
   type: TYPE_ARMOR,
   id: 258,
-  tileAddress: 0x48fada4,
+  tileAddresses: [ 0x48fada4 ],
 }]
 
 function tileFilter(item) {
@@ -919,9 +919,11 @@ function writeShort(data, address, value) {
   data[address + 1] = value >>> 8
 }
 
-function writeTileAddress(data) {
+function writeTileAddresses(data) {
   return function(item) {
-    writeShort(data, item.tileAddress, item.id + tileIdOffset)
+    item.tileAddresses.forEach(function(address) {
+      writeShort(data, address, item.id + tileIdOffset)
+    })
   }
 }
 
@@ -1027,9 +1029,9 @@ function randomizeEquipment(data, options) {
     // Shuffle tile addresses among shop equipment.
     const shopEquipmentWithTiles = shopEquipment.filter(tileFilter)
     shuffled(shopEquipmentWithTiles).map(function(item) {
-      return item.tileAddress
+      return item.tileAddresses
     }).forEach(function(tileAddress, index) {
-      shopEquipmentWithTiles[index].tileAddress = tileAddress
+      shopEquipmentWithTiles[index].tileAddresses = tileAddresses
     })
     // Create arrays for each type of shuffled equipment.
     const shuffledWeapons = shuffled(weapons)
@@ -1057,8 +1059,8 @@ function randomizeEquipment(data, options) {
     // Write shop equipment menu to ROM.
     shopEquipment.forEach(writeShopAddress(data))
     // Write shop equipment tiles to ROM.
-    shopEquipment.filter(tileFilter).forEach(writeTileAddress(data))
+    shopEquipment.filter(tileFilter).forEach(writeTileAddresses(data))
     // Write remaining equipment tiles to ROM.
-    tileEquipment.forEach(writeTileAddress(data))
+    tileEquipment.forEach(writeTileAddresses(data))
   }
 }
