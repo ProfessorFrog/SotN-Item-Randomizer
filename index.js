@@ -12,9 +12,12 @@ const equipBaseAddress = 0x11a0d0
 // This is applied to item ids that are found in the map.
 const tileIdOffset = 0x80
 
-// This is applied to helmet, armor, cloak, and other ids that are
-// sold in the librarian's shop menu.
-const shopIdOffset = -0xa9
+// This is applied to helmet, armor, cloak, and other ids that are sold in the
+// librarian's shop menu or are in an equipment slot.
+const equipIdOffset = -0xa9
+
+// This is applied to equipment id to get the inventory slot it occupies.
+const invIdOffset = 0x798a
 
 // Equipment list.
 // Note that some items are disabled for various reasons.
@@ -936,7 +939,7 @@ function writeShopAddress(data) {
     case TYPE_ARMOR:
     case TYPE_CLOAK:
     case TYPE_OTHER:
-      offset = shopIdOffset
+      offset = equipIdOffset
       break
     }
     // Patch rom.
@@ -970,17 +973,17 @@ function randomizeEquipment(data, options) {
     // Their values when equipped.
     const swordEquipVal = sword.id
     const shieldEquipVal = shield.id
-    const helmetEquipVal = 27 + helmet.id - helmets[0].id
-    const armorEquipVal = 1 + armor.id - armors[0].id
-    const cloakEquipVal = 49 + cloak.id - cloaks[0].id
-    const otherEquipVal = 58 + other.id - others[0].id
+    const helmetEquipVal = helmet.id + equipIdOffset
+    const armorEquipVal = armor.id + equipIdOffset
+    const cloakEquipVal = cloak.id + equipIdOffset
+    const otherEquipVal = other.id + equipIdOffset
     // Their inventory locations.
-    const swordInvOffset = sword.id + 0x798a
-    const shieldInvOffset = shield.id + 0x798a
-    const helmetInvOffset = helmet.id + 0x798a
-    const armorInvOffset = armor.id + 0x798a
-    const cloakInvOffset = cloak.id + 0x798a
-    const otherInvOffset = other.id + 0x798a
+    const swordInvOffset = sword.id + invIdOffset
+    const shieldInvOffset = shield.id + invIdOffset
+    const helmetInvOffset = helmet.id + invIdOffset
+    const armorInvOffset = armor.id + invIdOffset
+    const cloakInvOffset = cloak.id + invIdOffset
+    const otherInvOffset = other.id + invIdOffset
     // Equip the items.
     writeShort(data, equipBaseAddress +  0, swordEquipVal)
     writeShort(data, equipBaseAddress + 12, shieldEquipVal)
@@ -1026,14 +1029,16 @@ function randomizeEquipment(data, options) {
     const shopArmors = shopEquipment.filter(armorFilter)
     const shopCloaks = shopEquipment.filter(cloakFilter)
     const shopOthers = shopEquipment.filter(otherFilter)
-    // Shuffle tile addresses among shop equipment.
+    // Shuffle tile addresses for shop items.
     const shopEquipmentWithTiles = shopEquipment.filter(tileFilter)
-    shuffled(shopEquipmentWithTiles).map(function(item) {
-      return item.tileAddresses
-    }).forEach(function(tileAddress, index) {
-      shopEquipmentWithTiles[index].tileAddresses = tileAddresses
+    const shuffledEquipmentWithTiles = shuffled(equipment.filter(tileFilter))
+    shopEquipmentWithTiles.forEach(function(shopItem) {
+      const item = shuffledEquipmentWithTiles.pop()
+      const shopItemTileAddresses = shopItem.tileAddresses
+      shopItem.tileAddresses = item.tileAddresses
+      item.tileAddresses = shopItemTileAddresses
     })
-    // Create arrays for each type of shuffled equipment.
+    // Shuffle each type of equipment.
     const shuffledWeapons = shuffled(weapons)
     const shuffledShields = shuffled(shields)
     const shuffledHelmets = shuffled(helmets)
