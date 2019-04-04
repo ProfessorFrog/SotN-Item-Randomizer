@@ -1124,6 +1124,14 @@ const armorFilter = typeFilter([TYPE_ARMOR])
 const cloakFilter = typeFilter([TYPE_CLOAK])
 const otherFilter = typeFilter([TYPE_OTHER])
 
+function tilesFilter(item) {
+  return 'tiles' in item
+}
+
+function shopFilter(item) {
+  return 'shopAddress' in item
+}
+
 function typeReduce(types, item) {
   if (!types) {
     types = []
@@ -1149,14 +1157,6 @@ function shuffled(array) {
   return shuffled
 }
 
-function eachType(types, func) {
-  types.forEach(function(items) {
-    if (Array.isArray(items)) {
-      items.forEach(func)
-    }
-  })
-}
-
 function writeShort(data, address, value) {
   data[address + 0] = value & 0xff
   data[address + 1] = value >>> 8
@@ -1174,7 +1174,7 @@ function flattened() {
   return flattened
 }
 
-function writeTileAddresses(data) {
+function writeTiles(data) {
   return function(item) {
     item.tiles.forEach(function(tile) {
       writeShort(data, tile.address, item.id + tileIdOffset)
@@ -1259,51 +1259,43 @@ function randomizeEquipment(data, options) {
     }).map(function(item) {
       return Object.assign({}, item)
     })
-    // Get shop only equipment.
-    const shopOnly = enabledEquipment.filter(function(item) {
-      return ('shopAddress' in item) && !('tiles' in item)
-    }).reduce(typeReduce, [])
-    // Get tile only equipment.
-    const tileOnly = enabledEquipment.filter(function(item) {
-      return !('shopAddress' in item) && ('tiles' in item)
-    }).reduce(typeReduce, [])
-    // Get shop and tile equipment.
-    const shopAndTile = enabledEquipment.filter(function(item) {
-      return ('shopAddress' in item) && ('tiles' in item)
-    }).reduce(typeReduce, [])
-    // Shuffle equipment addresses.
-    const shuffledEquipment = shuffled(enabledEquipment)
-    const shuffledTileAddresses = shuffledEquipment.filter(function(item) {
-      return 'tiles' in item
-    }).map(function(item) {
-      return {
-        type: item.type,
-        tiles: item.tiles,
-      }
-    }).reduce(typeReduce, [])
-    const shuffledShopAddresses = shuffledEquipment.filter(function(item) {
-      return 'shopAddress' in item
-    }).map(function(item) {
+    // Get shop equipment by type.
+    const shopTypes = enabledEquipment.filter(shopFilter).map(function(item) {
       return {
         type: item.type,
         shopAddress: item.shopAddress,
       }
     }).reduce(typeReduce, [])
-    // Assign shuffled equipment ids.
-    eachType(shopOnly, function(item) {
-      item.shopAddress = shuffledShopAddresses[item.type].pop().shopAddress
+    // Shuffle equipment by type.
+    const shuffledTypes = shuffled(enabledEquipment).map(function(item) {
+      return {
+        name: item.name,
+        type: item.type,
+        id: item.id,
+      }
+    }).reduce(typeReduce, [])
+    // Assign shop addresses.
+    shopTypes.forEach(function(items) {
+      if (Array.isArray(items)) {
+        items.forEach(function(to) {
+          const from = shuffledTypes[to.type].pop()
+          to.name = from.name
+          to.id = from.id
+        })
+      }
     })
-    eachType(tileOnly, function(item) {
-      item.tiles = shuffledTileAddresses[item.type].pop().tiles
-    })
-    eachType(shopAndTile, function(item) {
-      item.shopAddress = shuffledShopAddresses[item.type].pop().shopAddress
-      item.tiles = shuffledTileAddresses[item.type].pop().tiles
+    // Shuffle in shop equimpent to equipment list.
+    const shuffledEquipment = shuffled(flattened(shuffledTypes, shopTypes))
+    // Assign tiles.
+    enabledEquipment.filter(tilesFilter).map(function(item) {
+      return item.tiles
+    }).forEach(function(tiles, index) {
+      shuffledEquipment[index].tiles = tiles
     })
     // Write shop equipment to ROM.
-    flattened(shopOnly, shopAndTile).forEach(writeShopAddress(data))
+    shuffledEquipment.filter(shopFilter).forEach(writeShopAddress(data))
     // Write tiles equipment to ROM.
-    flattened(tileOnly, shopAndTile).forEach(writeTileAddresses(data))
+    shuffledEquipment.filter(tilesFilter).forEach(writeTiles(data))
   }
 }
 
