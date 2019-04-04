@@ -975,34 +975,42 @@ const equipment = [{
   name: 'Zircon',
   type: TYPE_OTHER,
   id: 232,
+  disableLocations: true,
 }, {
   name: 'Aquamarine',
   type: TYPE_OTHER,
   id: 233,
+  disableLocations: true,
 }, {
   name: 'Turquoise',
   type: TYPE_OTHER,
   id: 234,
+  disableLocations: true,
 }, {
   name: 'Onyx',
   type: TYPE_OTHER,
   id: 235,
+  disableLocations: true,
 }, {
   name: 'Garnet',
   type: TYPE_OTHER,
   id: 236,
+  disableLocations: true,
 }, {
   name: 'Opal',
   type: TYPE_OTHER,
   id: 237,
+  disableLocations: true,
 }, {
   name: 'Diamond',
   type: TYPE_OTHER,
   id: 238,
+  disableLocations: true,
 }, {
   name: 'Lapis Lazuli',
   type: TYPE_OTHER,
   id: 239,
+  disableLocations: true,
 }, {
   name: 'Ring of Ares',
   type: TYPE_OTHER,
@@ -1255,7 +1263,7 @@ function randomizeEquipment(data, options) {
   if (options.equipmentLocations) {
     // Filter out items that are disabled from randomization.
     const enabledEquipment = equipment.filter(function(item) {
-      return !item.disabled
+      return !item.disableLocations
     }).map(function(item) {
       return Object.assign({}, item)
     })
