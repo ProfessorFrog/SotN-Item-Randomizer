@@ -1256,6 +1256,8 @@ function randomizeEquipment(data, options) {
     // Filter out items that are disabled from randomization.
     const enabledEquipment = equipment.filter(function(item) {
       return !item.disabled
+    }).map(function(item) {
+      return Object.assign({}, item)
     })
     // Get shop only equipment.
     const shopOnly = enabledEquipment.filter(function(item) {
