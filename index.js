@@ -2172,6 +2172,9 @@ const items = [{
     0x49d3676, // Mirror Cuirass
   ],
   tiles: [{
+    zone: ZONE_NO2,
+    addresses: [ 0x4aa1555 ],
+  }, {
     zone: ZONE_NO3,
     addresses: [ 0x4b68604, 0x53f5f80 ],
   }, {
@@ -2385,22 +2388,21 @@ const helmetFilter = typeFilter([TYPE_HELMET])
 const armorFilter = typeFilter([TYPE_ARMOR])
 const cloakFilter = typeFilter([TYPE_CLOAK])
 const accessoryFilter = typeFilter([TYPE_ACCESSORY])
-const equipmentFilter = typeFilter([
-  TYPE_WEAPON1,
-  TYPE_WEAPON2,
-  TYPE_SHIELD,
-  TYPE_HELMET,
-  TYPE_ARMOR,
-  TYPE_CLOAK,
-  TYPE_ACCESSORY,
-])
-
-function usableFilter(item) {
-  return typeFilter([TYPE_USABLE])(item) && !item.food
-}
 
 function foodFilter(item) {
   return item.food
+}
+
+function usableFilter(item) {
+  return typeFilter([TYPE_USABLE])(item) && !foodFilter(item)
+}
+
+function salableFilter(item) {
+  return item.salable
+}
+
+function nonsalableFilter(item) {
+  return accessoryFilter(item) && !salableFilter(item)
 }
 
 function tilesFilter(item) {
@@ -2459,6 +2461,21 @@ function pushTile(item, tile) {
     item.tiles = []
   }
   item.tiles.push(tile)
+}
+
+function tileCountReduce(count, item) {
+  if (item.tiles) {
+    return count + item.tiles.length
+  }
+  return count
+}
+
+function eachTileItem(all, pool, filter, each) {
+  let count = all.filter(filter).reduce(tileCountReduce, 0)
+  pool = pool.filter(filter)
+  while (count--) {
+    each(pool)
+  }
 }
 
 function randItem(array) {
@@ -2636,29 +2653,17 @@ function randomizeItems(data, options) {
   }
   // Randomize item locations.
   if (options.itemLocations) {
-    // Clone item list.
-    const enabledItems = items.map(function(item) {
-      const clone = Object.assign({}, item)
-      if ('tiles' in clone) {
-        clone.tiles = clone.tiles.slice()
-      }
-      return clone
-    })
     // Shuffle equipment by type.
-    const shuffledTypes = shuffled(enabledItems).map(function(item) {
-      return {
-        name: item.name,
-        type: item.type,
-        id: item.id,
-        food: item.food,
-        addressBlacklist: item.addressBlacklist,
-      }
+    const shuffledTypes = shuffled(items).map(function(item) {
+      item = Object.assign({}, item)
+      delete item.tiles
+      delete item.shopAddress
+      return item
     }).reduce(typeReduce, [])
     // Get shop items by type.
-    const shopTypes = enabledItems.filter(shopFilter).map(function(item) {
+    const shopTypes = items.filter(shopFilter).map(function(item) {
       return {
         type: item.type,
-        salable: item.salable,
         shopAddress: item.shopAddress,
       }
     }).reduce(typeReduce, [])
@@ -2670,11 +2675,11 @@ function randomizeItems(data, options) {
           for (let i = 0; i < shuffledTypes[to.type].length; i++) {
             from = shuffledTypes[to.type][i]
             // You can't buy food from the shop.
-            if (from.food) {
+            if (foodFilter(from)) {
               continue
             }
             // Selling salable items could result in infinite gold.
-            if (from.salable) {
+            if (salableFilter(from)) {
               continue
             }
             shuffledTypes[to.type].splice(i, 1)
@@ -2687,56 +2692,48 @@ function randomizeItems(data, options) {
     })
     // Shuffle shop items back into item list.
     const shuffledItems = shuffled(flattened(shuffledTypes, shopTypes))
-    // Tally up tile types.
-    const tileItems = items.filter(tilesFilter)
-    const tileTypes = []
-    tileItems.forEach(function(item) {
-      for (let i = 0; i < item.tiles.length; i++) {
-        tileTypes.push({
-          type: item.type,
-          food: item.food,
-        })
-      }
-    })
-    const typeCount = {
-      equipment: tileTypes.filter(equipmentFilter).length,
-      powerup: tileTypes.filter(powerupFilter).length,
-      usable: tileTypes.filter(usableFilter).length,
-      food: tileTypes.filter(foodFilter).length,
-    }
-    // Get all tiles.
-    const shuffledTiles = shuffled(flattened(tileItems.map(function(item) {
-      return item.tiles
+    // Shuffle all tiles.
+    const shuffledTiles = shuffled(flattened(items.map(function(item) {
+      return item.tiles || []
     })))
-    // Delete tile information from shuffled item list.
-    shuffledItems.forEach(function(item) {
-      delete item.tiles
-    })
     // Place tiles with the same type frequency as vanilla.
-    const equipment = shuffledItems.filter(equipmentFilter)
-    const powerup = shuffledItems.filter(powerupFilter)
-    const usable = shuffledItems.filter(usableFilter)
-    const food = shuffledItems.filter(foodFilter)
-    // Equipment gets at most one non-despawn tile.
-    while (typeCount.equipment--) {
-      const item = equipment.pop()
-      pushTile(item, takePermaTile(shuffledTiles, item.addressBlacklist))
-    }
-    // Powerups distribution can be random, but only in non-despawn tiles.
-    while (typeCount.powerup--) {
-      const item = randItem(powerup)
-      pushTile(item, takePermaTile(shuffledTiles, item.addressBlacklist))
-    }
-    // Usable items can occupy multiple tiles.
-    while (typeCount.usable--) {
-      const item = randItem(usable)
-      pushTile(item, takeTile(shuffledTiles, item.addressBlacklist))
-    }
-    // Food items can occupy multiple tiles.
-    while (typeCount.food--) {
-      const item = randItem(food)
-      pushTile(item, takeTile(shuffledTiles, item.addressBlacklist))
-    }
+    // Equipment is unique and placed in non-despawn tiles.
+    const equipment = [
+      weaponFilter,
+      shieldFilter,
+      helmetFilter,
+      armorFilter,
+      cloakFilter,
+      nonsalableFilter,
+    ]
+    equipment.forEach(function(filter) {
+      eachTileItem(items, shuffledItems, filter, function(items) {
+        const item = items.pop()
+        pushTile(item, takePermaTile(shuffledTiles, item.addressBlacklist))
+      })
+    })
+    // Powerups and salables are in multiple non-despawn tiles.
+    const powerup = [
+      powerupFilter,
+      salableFilter,
+    ]
+    powerup.forEach(function(filter) {
+      eachTileItem(items, shuffledItems, filter, function(items) {
+        const item = randItem(items)
+        pushTile(item, takePermaTile(shuffledTiles, item.addressBlacklist))
+      })
+    })
+    // Usable items can occupy multiple (possibly despawn) tiles.
+    const usable = [
+      usableFilter,
+      foodFilter,
+    ]
+    usable.forEach(function(filter) {
+      eachTileItem(items, shuffledItems, filter, function(items) {
+        const item = randItem(items)
+        pushTile(item, takeTile(shuffledTiles, item.addressBlacklist))
+      })
+    })
     // Write shop items to ROM.
     shuffledItems.filter(shopFilter).forEach(writeShopAddress(data))
     // Write tiles items to ROM.
