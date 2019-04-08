@@ -2450,7 +2450,7 @@ function takeTile(tiles, blacklist) {
 
 function takePermaTile(tiles, blacklist) {
   return takeNext(tiles, function(tile) {
-    return (!tile.despawn && !blacklisted(tile, blacklist))
+    return (!blacklisted(tile, blacklist) && !tile.despawn)
   })
 }
 
@@ -2566,7 +2566,7 @@ function randomizeItems(data, options) {
           mismatches.push({
             name: item.name,
             id: item.id,
-            shopAddress: '0x' + tile.shopAddress.toString(16),
+            shopAddress: '0x' + item.shopAddress.toString(16),
           })
         }
       }
@@ -2578,8 +2578,7 @@ function randomizeItems(data, options) {
           console.error(item)
         })
       }
-    }
-    if (options.verbose) {
+    } else if (options.verbose) {
       console.log('item data is vanilla')
     }
     return
@@ -2652,6 +2651,7 @@ function randomizeItems(data, options) {
         type: item.type,
         id: item.id,
         food: item.food,
+        addressBlacklist: item.addressBlacklist,
       }
     }).reduce(typeReduce, [])
     // Get shop items by type.
