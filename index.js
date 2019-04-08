@@ -2658,6 +2658,7 @@ function randomizeItems(data, options) {
     const shopTypes = enabledItems.filter(shopFilter).map(function(item) {
       return {
         type: item.type,
+        salable: item.salable,
         shopAddress: item.shopAddress,
       }
     }).reduce(typeReduce, [])
