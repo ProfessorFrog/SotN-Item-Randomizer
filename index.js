@@ -2173,7 +2173,7 @@ const items = [{
   ],
   tiles: [{
     zone: ZONE_NO2,
-    addresses: [ 0x4aa1555 ],
+    addresses: [ 0x4aa1556 ],
   }, {
     zone: ZONE_NO3,
     addresses: [ 0x4b68604, 0x53f5f80 ],
