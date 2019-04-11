@@ -2551,7 +2551,7 @@ function writeShopAddress(data) {
   }
 }
 
-function randomizeItems(data, options) {
+function randomizeItems(data, options, info) {
   // Run a sanity check.
   if (options.checkVanilla) {
     const mismatches = []
@@ -2603,43 +2603,43 @@ function randomizeItems(data, options) {
   // Randomize starting equipment.
   if (options.startingEquipment) {
     // Select random starting equipment.
-    const sword = randItem(items.filter(typeFilter([TYPE_WEAPON1])))
+    const weapon = randItem(items.filter(typeFilter([TYPE_WEAPON1])))
     const shield = randItem(items.filter(shieldFilter))
     const helmet = randItem(items.filter(helmetFilter))
     const armor = randItem(items.filter(armorFilter))
     const cloak = randItem(items.filter(cloakFilter))
     const accessory = randItem(items.filter(accessoryFilter))
     // Their values when equipped.
-    const swordEquipVal = sword.id
+    const weaponEquipVal = weapon.id
     const shieldEquipVal = shield.id
     const helmetEquipVal = helmet.id + equipIdOffset
     const armorEquipVal = armor.id + equipIdOffset
     const cloakEquipVal = cloak.id + equipIdOffset
     const accessoryEquipVal = accessory.id + equipIdOffset
     // Their inventory locations.
-    const swordInvOffset = sword.id + equipmentInvIdOffset
+    const weaponInvOffset = weapon.id + equipmentInvIdOffset
     const shieldInvOffset = shield.id + equipmentInvIdOffset
     const helmetInvOffset = helmet.id + equipmentInvIdOffset
     const armorInvOffset = armor.id + equipmentInvIdOffset
     const cloakInvOffset = cloak.id + equipmentInvIdOffset
     const accessoryInvOffset = accessory.id + equipmentInvIdOffset
     // Equip the items.
-    writeShort(data, equipBaseAddress +  0, swordEquipVal)
+    writeShort(data, equipBaseAddress +  0, weaponEquipVal)
     writeShort(data, equipBaseAddress + 12, shieldEquipVal)
     writeShort(data, equipBaseAddress + 24, helmetEquipVal)
     writeShort(data, equipBaseAddress + 36, armorEquipVal)
     writeShort(data, equipBaseAddress + 48, cloakEquipVal)
     writeShort(data, equipBaseAddress + 60, accessoryEquipVal)
     // Death removes these values if equipped.
-    data[0x1195f8] = swordEquipVal
+    data[0x1195f8] = weaponEquipVal
     data[0x119658] = shieldEquipVal
     data[0x1196b8] = helmetEquipVal
     data[0x1196f4] = armorEquipVal
     data[0x119730] = cloakEquipVal
     data[0x119774] = accessoryEquipVal
     // Death decrements these inventory values if not equiped.
-    writeShort(data, 0x119634, swordInvOffset)
-    writeShort(data, 0x119648, swordInvOffset)
+    writeShort(data, 0x119634, weaponInvOffset)
+    writeShort(data, 0x119648, weaponInvOffset)
     writeShort(data, 0x119694, shieldInvOffset)
     writeShort(data, 0x1196a8, shieldInvOffset)
     writeShort(data, 0x1196d0, helmetInvOffset)
@@ -2650,6 +2650,15 @@ function randomizeItems(data, options) {
     writeShort(data, 0x119764, cloakInvOffset)
     writeShort(data, 0x1197b0, accessoryInvOffset)
     writeShort(data, 0x1197c4, accessoryInvOffset)
+    // Update info.
+    info.startingEquipment = [
+      weapon.name,
+      shield.name,
+      helmet.name,
+      armor.name,
+      cloak.name,
+      accessory.name,
+    ]
   }
   // Randomize item locations.
   if (options.itemLocations) {
