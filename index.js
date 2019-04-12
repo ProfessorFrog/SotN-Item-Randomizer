@@ -2651,7 +2651,7 @@ function randomizeItems(data, options, info) {
     writeShort(data, 0x1197b0, accessoryInvOffset)
     writeShort(data, 0x1197c4, accessoryInvOffset)
     // Update info.
-    info.startingEquipment = [
+    info['Starting equipment'] = [
       weapon.name,
       shield.name,
       helmet.name,
