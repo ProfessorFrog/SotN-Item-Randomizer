@@ -2372,6 +2372,18 @@ const items = [{
   }],
 }]
 
+function itemFromName(name) {
+  return items.filter(function(item) {
+    return item.name === name
+  }).pop()
+}
+
+function itemFromId(id) {
+  return items.filter(function(item) {
+    return item.id === id
+  }).pop()
+}
+
 function typeFilter(types) {
   return function(item) {
     return types.indexOf(item.type) !== -1
@@ -2534,202 +2546,238 @@ function writeShopAddress(data) {
 }
 
 function randomizeItems(data, options, info) {
-  // Run a sanity check.
-  if (options.checkVanilla) {
-    const mismatches = []
-    items.forEach(function(item) {
-      if (item.tiles) {
-        item.tiles.forEach(function(tile) {
-          tile.addresses.forEach(function(address) {
-            let found
-            if (tile.byte) {
-              found = (data[address] === item.id)
-            } else {
-              const id = tileId(item)
-              found = (data[address] === (id & 0xff))
-                && (data[address + 1] === (id >>> 8))
-            }
-            if (!found) {
-              mismatches.push({
-                name: item.name,
-                id: item.id,
-                zone: tile.zone,
-                tileAddress: '0x' + address.toString(16),
-              })
-            }
-          })
-        })
-      }
-      if (item.shopAddress) {
-        if (data[item.shopAddress] !== getShopValue(item)) {
-          mismatches.push({
-            name: item.name,
-            id: item.id,
-            shopAddress: '0x' + item.shopAddress.toString(16),
-          })
-        }
-      }
-    })
-    if (mismatches.length) {
-      if (options.verbose) {
-        console.error('item mismatches:')
-        mismatches.forEach(function(item) {
-          console.error(item)
-        })
-      }
-    } else if (options.verbose) {
-      console.log('item data is vanilla')
-    }
-    return
-  }
+  let returnVal = true
   // Randomize starting equipment.
   if (options.startingEquipment) {
-    // Select random starting equipment.
-    const weapon = randItem(items.filter(typeFilter([TYPE_WEAPON1])))
-    const shield = randItem(items.filter(shieldFilter))
-    const helmet = randItem(items.filter(helmetFilter))
-    const armor = randItem(items.filter(armorFilter))
-    const cloak = randItem(items.filter(cloakFilter))
-    const accessory = randItem(items.filter(accessoryFilter))
-    // Their values when equipped.
-    const weaponEquipVal = weapon.id
-    const shieldEquipVal = shield.id
-    const helmetEquipVal = helmet.id + equipIdOffset
-    const armorEquipVal = armor.id + equipIdOffset
-    const cloakEquipVal = cloak.id + equipIdOffset
-    const accessoryEquipVal = accessory.id + equipIdOffset
-    // Their inventory locations.
-    const weaponInvOffset = weapon.id + equipmentInvIdOffset
-    const shieldInvOffset = shield.id + equipmentInvIdOffset
-    const helmetInvOffset = helmet.id + equipmentInvIdOffset
-    const armorInvOffset = armor.id + equipmentInvIdOffset
-    const cloakInvOffset = cloak.id + equipmentInvIdOffset
-    const accessoryInvOffset = accessory.id + equipmentInvIdOffset
-    // Equip the items.
-    writeShort(data, equipBaseAddress +  0, weaponEquipVal)
-    writeShort(data, equipBaseAddress + 12, shieldEquipVal)
-    writeShort(data, equipBaseAddress + 24, helmetEquipVal)
-    writeShort(data, equipBaseAddress + 36, armorEquipVal)
-    writeShort(data, equipBaseAddress + 48, cloakEquipVal)
-    writeShort(data, equipBaseAddress + 60, accessoryEquipVal)
-    // Death removes these values if equipped.
-    data[0x1195f8] = weaponEquipVal
-    data[0x119658] = shieldEquipVal
-    data[0x1196b8] = helmetEquipVal
-    data[0x1196f4] = armorEquipVal
-    data[0x119730] = cloakEquipVal
-    data[0x119774] = accessoryEquipVal
-    // Death decrements these inventory values if not equiped.
-    writeShort(data, 0x119634, weaponInvOffset)
-    writeShort(data, 0x119648, weaponInvOffset)
-    writeShort(data, 0x119694, shieldInvOffset)
-    writeShort(data, 0x1196a8, shieldInvOffset)
-    writeShort(data, 0x1196d0, helmetInvOffset)
-    writeShort(data, 0x1196e4, helmetInvOffset)
-    writeShort(data, 0x11970c, armorInvOffset)
-    writeShort(data, 0x119720, armorInvOffset)
-    writeShort(data, 0x119750, cloakInvOffset)
-    writeShort(data, 0x119764, cloakInvOffset)
-    writeShort(data, 0x1197b0, accessoryInvOffset)
-    writeShort(data, 0x1197c4, accessoryInvOffset)
-    // Update info.
-    info[2]['Starting equipment'] = [
-      weapon.name,
-      shield.name,
-      helmet.name,
-      armor.name,
-      cloak.name,
-      accessory.name,
-    ]
+    // Run a sanity check.
+    if (options.checkVanilla) {
+      const equipment = [
+        itemFromName('Alucard Sword'),
+        itemFromName('Alucard Shield'),
+        itemFromName('Dragon Helm'),
+        itemFromName('Alucard Mail'),
+        itemFromName('Twilight Cloak'),
+        itemFromName('Necklace of J'),
+      ]
+      const mismatches = []
+      for (let i = 0; i < 6; i++) {
+        let expected = equipment[i].id
+        let actual = data[equipBaseAddress + i * 12]
+        if (i > 1) {
+          expected += equipIdOffset
+        }
+        if (actual !== expected) {
+          mismatches.push(itemFromId(actual).name)
+        }
+      }
+      if (mismatches.length) {
+        if (options.verbose) {
+          console.error('starting equipment mismatches:')
+          mismatches.forEach(function(item) {
+            console.error(item)
+          })
+        }
+        returnVal = false
+      } else if (options.verbose) {
+        console.log('starting equipment is vanilla')
+      }
+    } else {
+      // Select random starting equipment.
+      const weapon = randItem(items.filter(typeFilter([TYPE_WEAPON1])))
+      const shield = randItem(items.filter(shieldFilter))
+      const helmet = randItem(items.filter(helmetFilter))
+      const armor = randItem(items.filter(armorFilter))
+      const cloak = randItem(items.filter(cloakFilter))
+      const accessory = randItem(items.filter(accessoryFilter))
+      // Their values when equipped.
+      const weaponEquipVal = weapon.id
+      const shieldEquipVal = shield.id
+      const helmetEquipVal = helmet.id + equipIdOffset
+      const armorEquipVal = armor.id + equipIdOffset
+      const cloakEquipVal = cloak.id + equipIdOffset
+      const accessoryEquipVal = accessory.id + equipIdOffset
+      // Their inventory locations.
+      const weaponInvOffset = weapon.id + equipmentInvIdOffset
+      const shieldInvOffset = shield.id + equipmentInvIdOffset
+      const helmetInvOffset = helmet.id + equipmentInvIdOffset
+      const armorInvOffset = armor.id + equipmentInvIdOffset
+      const cloakInvOffset = cloak.id + equipmentInvIdOffset
+      const accessoryInvOffset = accessory.id + equipmentInvIdOffset
+      // Equip the items.
+      writeShort(data, equipBaseAddress +  0, weaponEquipVal)
+      writeShort(data, equipBaseAddress + 12, shieldEquipVal)
+      writeShort(data, equipBaseAddress + 24, helmetEquipVal)
+      writeShort(data, equipBaseAddress + 36, armorEquipVal)
+      writeShort(data, equipBaseAddress + 48, cloakEquipVal)
+      writeShort(data, equipBaseAddress + 60, accessoryEquipVal)
+      // Death removes these values if equipped.
+      data[0x1195f8] = weaponEquipVal
+      data[0x119658] = shieldEquipVal
+      data[0x1196b8] = helmetEquipVal
+      data[0x1196f4] = armorEquipVal
+      data[0x119730] = cloakEquipVal
+      data[0x119774] = accessoryEquipVal
+      // Death decrements these inventory values if not equiped.
+      writeShort(data, 0x119634, weaponInvOffset)
+      writeShort(data, 0x119648, weaponInvOffset)
+      writeShort(data, 0x119694, shieldInvOffset)
+      writeShort(data, 0x1196a8, shieldInvOffset)
+      writeShort(data, 0x1196d0, helmetInvOffset)
+      writeShort(data, 0x1196e4, helmetInvOffset)
+      writeShort(data, 0x11970c, armorInvOffset)
+      writeShort(data, 0x119720, armorInvOffset)
+      writeShort(data, 0x119750, cloakInvOffset)
+      writeShort(data, 0x119764, cloakInvOffset)
+      writeShort(data, 0x1197b0, accessoryInvOffset)
+      writeShort(data, 0x1197c4, accessoryInvOffset)
+      // Update info.
+      info[2]['Starting equipment'] = [
+        weapon.name,
+        shield.name,
+        helmet.name,
+        armor.name,
+        cloak.name,
+        accessory.name,
+      ]
+    }
   }
   // Randomize item locations.
   if (options.itemLocations) {
-    // Shuffle equipment by type.
-    const shuffledTypes = shuffled(items).map(function(item) {
-      item = Object.assign({}, item)
-      delete item.tiles
-      delete item.shopAddress
-      return item
-    }).reduce(typeReduce, [])
-    // Get shop items by type.
-    const shopTypes = items.filter(shopFilter).map(function(item) {
-      return {
-        type: item.type,
-        shopAddress: item.shopAddress,
-      }
-    }).reduce(typeReduce, [])
-    // Assign random shop addresses.
-    shopTypes.forEach(function(items) {
-      if (Array.isArray(items)) {
-        items.forEach(function(to) {
-          let from
-          for (let i = 0; i < shuffledTypes[to.type].length; i++) {
-            from = shuffledTypes[to.type][i]
-            // You can't buy food from the shop.
-            if (foodFilter(from)) {
-              continue
-            }
-            // Selling salable items could result in infinite gold.
-            if (salableFilter(from)) {
-              continue
-            }
-            shuffledTypes[to.type].splice(i, 1)
-            break
+    // Run a sanity check.
+    if (options.checkVanilla) {
+      const mismatches = []
+      items.forEach(function(item) {
+        if (item.tiles) {
+          item.tiles.forEach(function(tile) {
+            tile.addresses.forEach(function(address) {
+              let found
+              if (tile.byte) {
+                found = (data[address] === item.id)
+              } else {
+                const id = tileId(item)
+                found = (data[address] === (id & 0xff))
+                  && (data[address + 1] === (id >>> 8))
+              }
+              if (!found) {
+                mismatches.push({
+                  name: item.name,
+                  id: item.id,
+                  zone: tile.zone,
+                  tileAddress: '0x' + address.toString(16),
+                })
+              }
+            })
+          })
+        }
+        if (item.shopAddress) {
+          if (data[item.shopAddress] !== getShopValue(item)) {
+            mismatches.push({
+              name: item.name,
+              id: item.id,
+              shopAddress: '0x' + item.shopAddress.toString(16),
+            })
           }
-          to.name = from.name
-          to.id = from.id
-        })
+        }
+      })
+      if (mismatches.length) {
+        if (options.verbose) {
+          console.error('item mismatches:')
+          mismatches.forEach(function(item) {
+            console.error(item)
+          })
+        }
+      } else if (options.verbose) {
+        console.log('item data is vanilla')
       }
-    })
-    // Shuffle shop items back into item list.
-    const shuffledItems = shuffled(flattened(shuffledTypes, shopTypes))
-    // Shuffle all tiles.
-    const shuffledTiles = shuffled(flattened(items.map(function(item) {
-      return item.tiles || []
-    })))
-    // Place tiles with the same type frequency as vanilla.
-    // Equipment is unique and placed in non-despawn tiles.
-    const equipment = [
-      weaponFilter,
-      shieldFilter,
-      helmetFilter,
-      armorFilter,
-      cloakFilter,
-      nonsalableFilter,
-    ]
-    equipment.forEach(function(filter) {
-      eachTileItem(items, shuffledItems, filter, function(items) {
-        const item = items.pop()
-        pushTile(item, takePermaTile(shuffledTiles))
+    } else {
+      // Shuffle equipment by type.
+      const shuffledTypes = shuffled(items).map(function(item) {
+        item = Object.assign({}, item)
+        delete item.tiles
+        delete item.shopAddress
+        return item
+      }).reduce(typeReduce, [])
+      // Get shop items by type.
+      const shopTypes = items.filter(shopFilter).map(function(item) {
+        return {
+          type: item.type,
+          shopAddress: item.shopAddress,
+        }
+      }).reduce(typeReduce, [])
+      // Assign random shop addresses.
+      shopTypes.forEach(function(items) {
+        if (Array.isArray(items)) {
+          items.forEach(function(to) {
+            let from
+            for (let i = 0; i < shuffledTypes[to.type].length; i++) {
+              from = shuffledTypes[to.type][i]
+              // You can't buy food from the shop.
+              if (foodFilter(from)) {
+                continue
+              }
+              // Selling salable items could result in infinite gold.
+              if (salableFilter(from)) {
+                continue
+              }
+              shuffledTypes[to.type].splice(i, 1)
+              break
+            }
+            to.name = from.name
+            to.id = from.id
+          })
+        }
       })
-    })
-    // Powerups and salables are in multiple non-despawn tiles.
-    const powerup = [
-      powerupFilter,
-      salableFilter,
-    ]
-    powerup.forEach(function(filter) {
-      eachTileItem(items, shuffledItems, filter, function(items) {
-        const item = randItem(items)
-        pushTile(item, takePermaTile(shuffledTiles))
+      // Shuffle shop items back into item list.
+      const shuffledItems = shuffled(flattened(shuffledTypes, shopTypes))
+      // Shuffle all tiles.
+      const shuffledTiles = shuffled(flattened(items.map(function(item) {
+        return item.tiles || []
+      })))
+      // Place tiles with the same type frequency as vanilla.
+      // Equipment is unique and placed in non-despawn tiles.
+      const equipment = [
+        weaponFilter,
+        shieldFilter,
+        helmetFilter,
+        armorFilter,
+        cloakFilter,
+        nonsalableFilter,
+      ]
+      equipment.forEach(function(filter) {
+        eachTileItem(items, shuffledItems, filter, function(items) {
+          const item = items.pop()
+          pushTile(item, takePermaTile(shuffledTiles))
+        })
       })
-    })
-    // Usable items can occupy multiple (possibly despawn) tiles.
-    const usable = [
-      usableFilter,
-      foodFilter,
-    ]
-    usable.forEach(function(filter) {
-      eachTileItem(items, shuffledItems, filter, function(items) {
-        const item = randItem(items)
-        pushTile(item, takeTile(shuffledTiles))
+      // Powerups and salables are in multiple non-despawn tiles.
+      const powerup = [
+        powerupFilter,
+        salableFilter,
+      ]
+      powerup.forEach(function(filter) {
+        eachTileItem(items, shuffledItems, filter, function(items) {
+          const item = randItem(items)
+          pushTile(item, takePermaTile(shuffledTiles))
+        })
       })
-    })
-    // Write shop items to ROM.
-    shuffledItems.filter(shopFilter).forEach(writeShopAddress(data))
-    // Write tiles items to ROM.
-    shuffledItems.filter(tilesFilter).forEach(writeTiles(data))
+      // Usable items can occupy multiple (possibly despawn) tiles.
+      const usable = [
+        usableFilter,
+        foodFilter,
+      ]
+      usable.forEach(function(filter) {
+        eachTileItem(items, shuffledItems, filter, function(items) {
+          const item = randItem(items)
+          pushTile(item, takeTile(shuffledTiles))
+        })
+      })
+      // Write shop items to ROM.
+      shuffledItems.filter(shopFilter).forEach(writeShopAddress(data))
+      // Write tiles items to ROM.
+      shuffledItems.filter(tilesFilter).forEach(writeTiles(data))
+    }
   }
+  return returnVal
 }
 
 try {
