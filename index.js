@@ -526,7 +526,10 @@ const items = [{
   type: TYPE_USABLE,
   id: 63,
   food: true,
-  // Missing
+  tiles: [{
+    zone: ZONE_CAT,
+    addresses: [ 0x04491302 ],
+  }],
 }, {
   name: 'Red Bean Bun',
   type: TYPE_USABLE,
