@@ -654,6 +654,7 @@ const items = [{
   }, {
     zone: ZONE_RNO4,
     addresses: [ 0x526c10e ],
+  }, {
     zone: ZONE_RNO4,
     addresses: [ 0x526c110 ],
   }],
