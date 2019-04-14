@@ -526,6 +526,7 @@ const items = [{
   type: TYPE_USABLE,
   id: 63,
   food: true,
+  // Missing
 }, {
   name: 'Red Bean Bun',
   type: TYPE_USABLE,
@@ -2652,7 +2653,7 @@ function randomizeItems(data, options, info) {
     writeShort(data, 0x1197b0, accessoryInvOffset)
     writeShort(data, 0x1197c4, accessoryInvOffset)
     // Update info.
-    info['Starting equipment'] = [
+    info[2]['Starting equipment'] = [
       weapon.name,
       shield.name,
       helmet.name,
