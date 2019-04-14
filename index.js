@@ -2172,10 +2172,6 @@ const items = [{
   name: 'Heart Vessel',
   type: TYPE_POWERUP,
   id: 12,
-  addressBlacklist: [
-    0x49d3674, // Jewel Knuckles
-    0x49d3676, // Mirror Cuirass
-  ],
   tiles: [{
     zone: ZONE_NO2,
     addresses: [ 0x4aa1556 ],
@@ -2277,10 +2273,6 @@ const items = [{
   name: 'Life Vessel',
   type: TYPE_POWERUP,
   id: 23,
-  addressBlacklist: [
-    0x49d3674, // Jewel Knuckles
-    0x49d3676, // Mirror Cuirass
-  ],
   tiles: [{
     zone: ZONE_NO3,
     addresses: [ 0x4b68606, 0x53f5f82 ],
@@ -2429,35 +2421,20 @@ function typeReduce(types, item) {
   return types
 }
 
-function blacklisted(tile, blacklist) {
-  if (blacklist) {
-    for (let i = 0; i < blacklist.length; i++) {
-      if (tile.addresses.indexOf(blacklist[i]) !== -1) {
-        return true
-      }
-    }
-  }
-}
-
-function takeNext(list, filter) {
+function takeTile(list, filter) {
   for (let i = 0; i < list.length; i++) {
     const item = list[i]
-    if (filter(item)) {
-      list.splice(i, 1)
-      return item
+    if (filter && !filter(item)) {
+      continue
     }
+    list.splice(i, 1)
+    return item
   }
 }
 
-function takeTile(tiles, blacklist) {
-  return takeNext(tiles, function(tile) {
-    return (!blacklisted(tile, blacklist))
-  })
-}
-
-function takePermaTile(tiles, blacklist) {
-  return takeNext(tiles, function(tile) {
-    return (!blacklisted(tile, blacklist) && !tile.despawn)
+function takePermaTile(tiles) {
+  return takeTile(tiles, function(tile) {
+    return !tile.despawn
   })
 }
 
@@ -2723,7 +2700,7 @@ function randomizeItems(data, options, info) {
     equipment.forEach(function(filter) {
       eachTileItem(items, shuffledItems, filter, function(items) {
         const item = items.pop()
-        pushTile(item, takePermaTile(shuffledTiles, item.addressBlacklist))
+        pushTile(item, takePermaTile(shuffledTiles))
       })
     })
     // Powerups and salables are in multiple non-despawn tiles.
@@ -2734,7 +2711,7 @@ function randomizeItems(data, options, info) {
     powerup.forEach(function(filter) {
       eachTileItem(items, shuffledItems, filter, function(items) {
         const item = randItem(items)
-        pushTile(item, takePermaTile(shuffledTiles, item.addressBlacklist))
+        pushTile(item, takePermaTile(shuffledTiles))
       })
     })
     // Usable items can occupy multiple (possibly despawn) tiles.
@@ -2745,7 +2722,7 @@ function randomizeItems(data, options, info) {
     usable.forEach(function(filter) {
       eachTileItem(items, shuffledItems, filter, function(items) {
         const item = randItem(items)
-        pushTile(item, takeTile(shuffledTiles, item.addressBlacklist))
+        pushTile(item, takeTile(shuffledTiles))
       })
     })
     // Write shop items to ROM.
