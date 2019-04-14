@@ -2687,7 +2687,7 @@ function randomizeItems(data, options, info) {
           })
         }
       } else if (options.verbose) {
-        console.log('item data is vanilla')
+        console.log('item locations are vanilla')
       }
     } else {
       // Shuffle equipment by type.
