@@ -2770,14 +2770,26 @@ function randomizeItems(data, options, info) {
           pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
         })
       })
-      // Powerups and salables are in multiple non-despawn tiles.
-      const powerup = [
-        powerupFilter,
-        salableFilter,
+      // Powerups are in multiple non-despawn tiles.
+      eachTileItem(items, shuffledItems, powerupFilter, function(items) {
+        const item = randItem(items)
+        pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
+      })
+      // Distribute jewels with same frequency as vanilla.
+      const salableItemNames = [
+        'Zircon',
+        'Aquamarine',
+        'Turquoise',
+        'Onyx',
+        'Garnet',
+        'Opal',
+        'Diamond',
       ]
-      powerup.forEach(function(filter) {
-        eachTileItem(items, shuffledItems, filter, function(items) {
-          const item = randItem(items)
+      salableItemNames.forEach(function(salableItemName) {
+        eachTileItem(items, shuffledItems, function(item) {
+          return item.name === salableItemName
+        }, function(items) {
+          const item = items[0]
           pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
         })
       })
