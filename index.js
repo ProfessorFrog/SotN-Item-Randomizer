@@ -2776,18 +2776,10 @@ function randomizeItems(data, options, info) {
         pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
       })
       // Distribute jewels with same frequency as vanilla.
-      const salableItemNames = [
-        'Zircon',
-        'Aquamarine',
-        'Turquoise',
-        'Onyx',
-        'Garnet',
-        'Opal',
-        'Diamond',
-      ]
-      salableItemNames.forEach(function(salableItemName) {
+      const salableItems = items.filter(salableFilter)
+      salableItems.forEach(function(salableItem) {
         eachTileItem(items, shuffledItems, function(item) {
-          return item.name === salableItemName
+          return item.id === salableItem.id
         }, function(items) {
           const item = items[0]
           pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
