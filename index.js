@@ -2372,6 +2372,9 @@ const items = [{
     zone: ZONE_RDAI,
     addresses: [ 0x4e322d8 ],
   }, {
+    zone: ZONE_RDAI,
+    addresses: [ 0x4e322cc ],
+  }, {
     zone: ZONE_RNO2,
     addresses: [ 0x50f87c8 ],
   }, {
