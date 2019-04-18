@@ -52,8 +52,8 @@
   // This is applied to item ids that are found in zone data.
   const tileIdOffset = 0x80
 
-  // This is applied to helmet, armor, cloak, and other ids that are sold in the
-  // librarian's shop menu or are in an equipment slot.
+  // This is applied to helmet, armor, cloak, and other ids that are sold in
+  // the librarian's shop menu or are in an equipment slot.
   const equipIdOffset = -0xa9
 
   // This is applied to equipment ids to get the inventory slot it occupies.
@@ -250,6 +250,12 @@
     }
   }
 
+  function toHex(num, width) {
+    const zeros = Array(width).fill('0').join('')
+    const hex = (zeros + num.toString(16)).slice(-width)
+    return '0x' + hex
+  }
+
   function randomizeItems(data, options, info) {
     // Check for duped addresses.
     const dups = []
@@ -267,7 +273,7 @@
     }))
     tiles.forEach(function(item) {
       item.tile.addresses.forEach(function(address) {
-        address = '0x' + ('00000000' + address.toString(16)).slice(-8)
+        address = toHex(address, 8)
         addresses[address] = addresses[address] || []
         const dup = Object.assign({}, item, {
           tile: Object.assign({}, item.tile),
@@ -405,18 +411,18 @@
                 const m = {
                   name: item.name,
                   zone: zones[tile.zone],
-                  address: '0x' + ('00000000' + address.toString(16)).slice(-8),
+                  address: toHex(address, 8)
                 }
                 if (tile.byte) {
                   found = (data[address] === value)
-                  m.expected = '0x' + ('00' + value.toString(16)).slice(-2)
-                  m.actual = '0x' + ('00' + data[address].toString(16)).slice(-2)
+                  m.expected = toHex(value, 2)
+                  m.actual = toHex(data[address], 2)
                 } else {
                   found = (data[address] === (value & 0xff))
                     && (data[address + 1] === (value >>> 8))
-                  m.expected = '0x' + ('0000' + value.toString(16)).slice(-4)
+                  m.expected = toHex(value, 4)
                   const actual = (data[address] << 8) + data[address + 1]
-                  m.actual = '0x' + ('0000' + actual.toString(16)).slice(-4)
+                  m.actual = toHex(actual, 4)
                 }
                 if (!found) {
                   mismatches.push(m)
