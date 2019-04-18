@@ -21,33 +21,38 @@
   }
 
   const ZONE = {
-    ARE: 0,   // Colosseum
-    CAT: 1,   // Catacombs
-    CHI: 2,   // Abandoned Pit the Catacomb
-    DAI: 3,   // Royal Chapel
-    LIB: 4,   // Long Library
-    NO0: 5,   // Marble Gallery
-    NO1: 6,   // Outer Wall
-    NO2: 7,   // Olrox's Quarters
-    NO3: 8,   // Castle Entrance
-    NO4: 9,   // Underground Caverns
-    NZ0: 10,  // Alchemy Laboratory
-    NZ1: 11,  // Clock Tower
-    TOP: 12,  // Castle Keep
-    RARE: 13, // Reverse Colosseum
-    RCAT: 14, // Floating Catacombs
-    RCHI: 15, // Cave
-    RDAI: 16, // Anti-Chapel
-    RLIB: 17, // Forbidden Library
-    RNO0: 18, // Black Marble Gallery
-    RNO1: 19, // Reverse Outer Wall
-    RNO2: 20, // Death Wing's Lair
-    RNO3: 21, // Reverse Entrance
-    RNO4: 22, // Reverse Caverns
-    RNZ0: 23, // Necromancy Laboratory
-    RNZ1: 24, // Reverse Clock Tower
-    RTOP: 25, // Reverse Castle Keep
+    ST0:  0, // Final Stage: Bloodlines
+    ARE:  1,  // Colosseum
+    CAT:  2,  // Catacombs
+    CHI:  3,  // Abandoned Pit the Catacomb
+    DAI:  4,  // Royal Chapel
+    LIB:  5,  // Long Library
+    NO0:  6,  // Marble Gallery
+    NO1:  7,  // Outer Wall
+    NO2:  8,  // Olrox's Quarters
+    NO3:  9,  // Castle Entrance
+    NP3:  10, // Castle Entrance (after visiting Alchemy Laboratory)
+    NO4:  11, // Underground Caverns
+    NZ0:  12, // Alchemy Laboratory
+    NZ1:  13, // Clock Tower
+    TOP:  14, // Castle Keep
+    RARE: 15, // Reverse Colosseum
+    RCAT: 16, // Floating Catacombs
+    RCHI: 17, // Cave
+    RDAI: 18, // Anti-Chapel
+    RLIB: 19, // Forbidden Library
+    RNO0: 20, // Black Marble Gallery
+    RNO1: 21, // Reverse Outer Wall
+    RNO2: 22, // Death Wing's Lair
+    RNO3: 23, // Reverse Entrance
+    RNO4: 24, // Reverse Caverns
+    RNZ0: 25, // Necromancy Laboratory
+    RNZ1: 26, // Reverse Clock Tower
+    RTOP: 27, // Reverse Castle Keep
   }
+
+  // Offsets in the bin of each zone file.
+  const offsets = []
 
   const items = [{
     name: 'Heart',
@@ -2743,6 +2748,7 @@
   const data = {
     TYPE: TYPE,
     ZONE: ZONE,
+    offsets: offsets,
     items: items,
   }
 
