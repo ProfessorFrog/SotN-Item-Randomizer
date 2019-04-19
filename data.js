@@ -52,7 +52,36 @@
   }
 
   // Offsets in the bin of each zone file.
-  const offsets = []
+  const offsets = [
+    0x0533efc8, // ZONE.ST0
+    0x043c2018, // ZONE.ARE
+    0x0448f938, // ZONE.CAT
+    0x045e8ae8, // ZONE.CHI
+    0x04675f08, // ZONE.DAI
+    0x047a1ae8, // ZONE.LIB
+    0x048f9a38, // ZONE.NO0
+    0x049d18b8, // ZONE.NO1
+    0x04aa0438, // ZONE.NO2
+    0x04b665e8, // ZONE.NO3
+    0x053f4708, // ZONE.NP3
+    0x04c307e8, // ZONE.NO4
+    0x054b0c88, // ZONE.NZ0
+    0x055724b8, // ZONE.NZ1
+    0x0560e7b8, // ZONE.TOP
+    0x057509e8, // ZONE.RARE
+    0x04cfa0b8, // ZONE.RCAT
+    0x04aa0438, // ZONE.RCHI
+    0x04e31458, // ZONE.RDAI
+    0x04ee2218, // ZONE.RLIB
+    0x04f84a28, // ZONE.RNO0
+    0x0504f558, // ZONE.RNO1
+    0x050f7948, // ZONE.RNO2
+    0x051ac758, // ZONE.RNO3
+    0x0526a868, // ZONE.RNO4
+    0x05902278, // ZONE.RNZ0
+    0x059bb0d8, // ZONE.RNZ1
+    0x057df998, // ZONE.RTOP
+  ]
 
   const items = [{
     name: 'Heart',
@@ -102,6 +131,42 @@
     name: '$5000',
     type: TYPE.GOLD,
     id: 11,
+  }, {
+    name: 'Dagger',
+    type: TYPE.SUBWEAPON,
+    id: 14,
+  }, {
+    name: 'Axe',
+    type: TYPE.SUBWEAPON,
+    id: 15,
+  }, {
+    name: 'Cross',
+    type: TYPE.SUBWEAPON,
+    id: 16,
+  }, {
+    name: 'Holy Water',
+    type: TYPE.SUBWEAPON,
+    id: 17,
+  }, {
+    name: 'Stopwatch',
+    type: TYPE.SUBWEAPON,
+    id: 18,
+  }, {
+    name: 'Bible',
+    type: TYPE.SUBWEAPON,
+    id: 19,
+  }, {
+    name: 'Rebound Stone',
+    type: TYPE.SUBWEAPON,
+    id: 20,
+  }, {
+    name: 'Vibhuti',
+    type: TYPE.SUBWEAPON,
+    id: 21,
+  }, {
+    name: 'Agunea',
+    type: TYPE.SUBWEAPON,
+    id: 22,
   }, {
     name: 'Heart Vessel',
     type: TYPE.POWERUP,
@@ -207,168 +272,6 @@
       zone: ZONE.RARE,
       addresses: [ 0x05751562 ],
     }],
-  }, {
-    name: 'Dagger',
-    type: TYPE.SUBWEAPON,
-    id: 14,
-    tiles: [{
-      zone: ZONE.NO3,
-      addresses: [ 0x053f8bae ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NO1,
-      addresses: [ 0x049d6258 ],
-      candle: 0x50,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x05575094 ],
-      candle: 0x40,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x05575746 ],
-      candle: 0x10,
-    }, {
-      zone: ZONE.NZ0,
-      addresses: [ 0x054b46cc ],
-      candle: 0x20,
-    }, {
-      zone: ZONE.NO0,
-      addresses: [ 0x048fd3de ],
-      candle: 0x10,
-    }, {
-      zone: ZONE.NO0,
-      addresses: [ 0x048fe028 ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NO4,
-      addresses: [ 0x04c34334 ],
-      candle: 0x00,
-    }],
-  }, {
-    name: 'Axe',
-    type: TYPE.SUBWEAPON,
-    id: 15,
-    tiles: [{
-      zone: ZONE.NO3,
-      addresses: [ 0x053f8c9e ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.CAT,
-      addresses: [ 0x044934f0 ],
-      candle: 0x10,
-    }, {
-      zone: ZONE.CHI,
-      addresses: [ 0x045eaa8a ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x0557537c ],
-      candle: 0x50,
-    }, {
-      zone: ZONE.TOP,
-      addresses: [ 0x056112f6 ],
-      candle: 0x60,
-    }, {
-      zone: ZONE.NZ0,
-      addresses: [ 0x054b45a0 ],
-      candle: 0x20,
-    }, {
-      zone: ZONE.NZ0,
-      addresses: [ 0x054b372c ],
-      tank: true,
-      byte: true,
-    }, {
-      zone: ZONE.NO0,
-      addresses: [ 0x048fd64a ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NO4,
-      addresses: [ 0x04c3572a ],
-      candle: 0x00,
-    }],
-  }, {
-    name: 'Cross',
-    type: TYPE.SUBWEAPON,
-    id: 16,
-    tiles: [{
-      zone: ZONE.NO3,
-      addresses: [ 0x053f9730, 0x053f8f3c ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x05575f9e ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.TOP,
-      addresses: [ 0x05610f48 ],
-      candle: 0x30,
-    }, {
-      zone: ZONE.NZ0,
-      addresses: [ 0x054b371c ],
-      tank: true,
-      byte: true,
-    }],
-  }, {
-    name: 'Holy Water',
-    type: TYPE.SUBWEAPON,
-    id: 17,
-    tiles: [{
-      zone: ZONE.NO3,
-      addresses: [ 0x053f8bd6 ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x05575030 ],
-      candle: 0x60,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x05575c42 ],
-      candle: 0x60,
-    }, {
-      zone: ZONE.NZ1,
-      addresses: [ 0x05575932 ],
-      candle: 0x60,
-    }, {
-      zone: ZONE.TOP,
-      addresses: [ 0x05610e12 ],
-      candle: 0x20,
-    }, {
-      zone: ZONE.NZ0,
-      addresses: [ 0x054b41ee ],
-      candle: 0x20,
-    }, {
-      zone: ZONE.NO0,
-      addresses: [ 0x048fd744 ],
-      candle: 0x10,
-    }, {
-      zone: ZONE.NO0,
-      addresses: [ 0x048fce6c ],
-      candle: 0x00,
-    }, {
-      zone: ZONE.NO4,
-      addresses: [ 0x04c34384 ],
-      candle: 0x00,
-    }],
-  }, {
-    name: 'Stopwatch',
-    type: TYPE.SUBWEAPON,
-    id: 18,
-  }, {
-    name: 'Bible',
-    type: TYPE.SUBWEAPON,
-    id: 19,
-  }, {
-    name: 'Rebound Stone',
-    type: TYPE.SUBWEAPON,
-    id: 20,
-  }, {
-    name: 'Vibhuti',
-    type: TYPE.SUBWEAPON,
-    id: 21,
-  }, {
-    name: 'Agunea',
-    type: TYPE.POWERUP,
-    id: 22,
   }, {
     name: 'Life Vessel',
     type: TYPE.POWERUP,

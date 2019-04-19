@@ -65,13 +65,13 @@
   function itemFromName(name) {
     return items.filter(function(item) {
       return item.name === name
-    }).pop()
+    })[0]
   }
 
   function itemFromId(id) {
     return items.filter(function(item) {
       return item.id === id
-    }).pop()
+    })[0]
   }
 
   function typeFilter(types) {
@@ -339,6 +339,67 @@
     return true
   }
 
+  function zoneOffset(offset) {
+    return offset + Math.floor(offset / 0x800) * 0x130
+  }
+
+  function getCandleEntities(data, pos, offset, rooms, candles) {
+    for (let i = 0; i < rooms; i++) {
+      const ptr = data.readUInt32LE(pos + zoneOffset(offset)) - 0x80180000
+      let entitiy
+      let count = 0
+      do {
+        const p = pos + zoneOffset(ptr + 10 * count++)
+        entity = data.subarray(p, p + 10)
+        if (entity.readUInt16LE(4) === 0xa001 &&
+            !(entity[9] & 0x0f) && entity[9] < 0x80) {
+          const candle = Array.from(entity).map(function(byte) {
+            return ('00' + byte.toString(16)).slice(-2)
+          }).join('')
+          candles[i][candle] = candles[i][candle] || []
+          candles[i][candle].push(p)
+        }
+      } while (entity.readUInt32LE() != 0xffffffff)
+      offset += 4
+    }
+  }
+
+  function findCandleAddresses(zone, data, pos) {
+    let layout = data.readUInt32LE(pos + 0x10) - 0x80180000
+    let rooms = 0
+    while (data[pos + zoneOffset(layout)] != 0x40) {
+      rooms++
+      layout += 8
+    }
+    const enter = data.readUInt32LE(pos + 3 * 4) - 0x80180000
+    const offX = data.readUInt16LE(pos + zoneOffset(enter + 0x1c))
+    const offY = data.readUInt16LE(pos + zoneOffset(enter + 0x28))
+    const candles = Array(rooms).fill(null).map(function() {
+      return {}
+    })
+    getCandleEntities(data, pos, offX, rooms, candles)
+    getCandleEntities(data, pos, offY, rooms, candles)
+    candles.forEach(function(room) {
+      Object.getOwnPropertyNames(room).forEach(function(key) {
+        const entity = key.match(/[0-9a-f]{2}/g).map(function(byte) {
+          return parseInt(byte, 16)
+        })
+        const candle = entity[9]
+        const id = entity[8]
+        const item = itemFromId(id)
+        const addresses = room[key]
+        if (!item.tiles) {
+          item.tiles = []
+        }
+        item.tiles.push({
+          zone: zone,
+          addresses: addresses,
+          candle: candle,
+        })
+      })
+    })
+  }
+
   function checkItemLocations(data, verbose) {
     const mismatches = []
     items.forEach(function(item) {
@@ -462,6 +523,10 @@
         // Check for item locations.
         returnVal = checkItemLocations(data, options.verbose) && returnVal
       } else {
+        // Find candle addresses.
+        offsets.forEach(function(offset, zone) {
+          findCandleAddresses(zone, data, offset)
+        })
         // Shuffle equipment by type.
         const shuffledTypes = shuffled(items).map(function(item) {
           item = Object.assign({}, item)
