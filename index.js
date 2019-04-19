@@ -110,10 +110,9 @@
     return Array.isArray(item.tiles)
   }
 
-  function shopFilter(item) {
-    return item.tiles && item.tiles.some(function(tile) {
-      return tile.shop
-    })
+  function mapTileFilter(tile) {
+    return !tile.shop && !tile.tank && !tile.reward
+      && typeof(tile.candle) === 'undefined'
   }
 
   function typeReduce(types, item) {
@@ -663,7 +662,11 @@
           return item
         }).reduce(typeReduce, [])
         // Get shop items by type.
-        const shopTypes = items.filter(shopFilter).map(function(item) {
+        const shopTypes = items.filter(function(item) {
+          return item.tiles && item.tiles.some(function(tile) {
+            return tile.shop
+          })
+        }).map(function(item) {
           return {
             type: item.type,
             tiles: item.tiles.filter(function(tile) {
@@ -696,23 +699,16 @@
         })
         // Shuffle shop items back into item list.
         const shuffledItems = shuffled(flattened(shuffledTypes, shopTypes))
-        // Shuffle all non-shop tiles.
-        const shuffledTiles = shuffled(flattened(items.map(function(item) {
-          if (item.tiles) {
-            return item.tiles.filter(function(tile) {
-              return !tile.shop
-            })
-          }
-          return []
-        })))
-        // Get placeable tiles.
+        // Get all map tiles.
         const tileItems = items.map(function(item) {
           return Object.assign({}, item, {
-            tiles: (item.tiles || []).filter(function(tile) {
-              return !tile.shop && !tile.tank
-            })
+            tiles: (item.tiles || []).filter(mapTileFilter)
           })
         })
+        // Shuffle all map tiles.
+        const shuffledTiles = shuffled(flattened(tileItems.map(function(item) {
+          return item.tiles
+        })))
         // Place tiles with the same type frequency as vanilla.
         // Equipment is unique and placed in non-despawn tiles.
         const equipment = [

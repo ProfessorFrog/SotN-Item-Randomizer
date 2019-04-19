@@ -1149,6 +1149,11 @@
     tiles: [{
       zone: ZONE.RLIB,
       addresses: [ 0x04ee2f1c ],
+    }, {
+      zone: ZONE.ST0,
+      addresses: [ 0x00119d00 ],
+      byte: true,
+      reward: true,
     }],
   }, {
     name: 'Power of Sire',
@@ -1726,6 +1731,11 @@
     }, {
       zone: ZONE.RNO2,
       addresses: [ 0x050f87ca ],
+    }, {
+      zone: ZONE.ST0,
+      addresses: [ 0x00119ca4 ],
+      byte: true,
+      reward: true,
     }],
   }, {
     name: 'Runesword',
@@ -1982,6 +1992,11 @@
       zone: ZONE.LIB,
       addresses: [ 0x047a309e ],
       shop: true,
+    }, {
+      zone: ZONE.ST0,
+      addresses: [ 0x00119bb8 ],
+      byte: true,
+      reward: true,
     }],
   }, {
     name: 'High Potion',
