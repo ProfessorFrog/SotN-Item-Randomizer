@@ -14,11 +14,11 @@
 
   const TYPE = data.TYPE
   const ZONE = data.ZONE
-  const offsets = data.offsets
+  const zones = data.zones
   const items = data.items
 
   // List of zone strings for logging.
-  const zones = [
+  const zoneNames = [
     'ST0',
     'ARE',
     'CAT',
@@ -88,6 +88,7 @@
   const armorFilter = typeFilter([TYPE.ARMOR])
   const cloakFilter = typeFilter([TYPE.CLOAK])
   const accessoryFilter = typeFilter([TYPE.ACCESSORY])
+  const subweaponFilter = typeFilter([TYPE.SUBWEAPON])
 
   function foodFilter(item) {
     return item.food
@@ -254,10 +255,198 @@
     }
   }
 
-  function toHex(num, width) {
+  function numToHex(num, width) {
     const zeros = Array(width).fill('0').join('')
     const hex = (zeros + num.toString(16)).slice(-width)
     return '0x' + hex
+  }
+
+  function bufToHex(buf) {
+    return Array.from(buf).map(function(byte) {
+      return ('00' + byte.toString(16)).slice(-2)
+    }).join('')
+  }
+
+  function readUInt32LE(data, offset) {
+    offset = offset || 0
+    const buf = new ArrayBuffer(4)
+    new Uint8Array(buf).set(data.subarray(offset, offset + 4))
+    return new DataView(buf).getUint32(0, true)
+  }
+    
+  function readUInt16LE(data, offset) {
+    offset = offset || 0
+    const buf = new ArrayBuffer(2)
+    new Uint8Array(buf).set(data.subarray(offset, offset + 2))
+    return new DataView(buf).getUint16(0, true)
+  }
+
+  function restoreZone(data, offset, zoneLength) {
+    const dataLength = zoneLength + Math.floor(zoneLength / 0x800) * 0x130
+    data = data.subarray(offset, offset + dataLength)
+    const zone = new Uint8Array(zoneLength)
+    let curr = zone
+    while (data.length) {
+      curr.set(data.subarray(0, 0x800))
+      curr = curr.subarray(0x800)
+      data = data.subarray(0x800 + 0x130)
+    }
+    return zone
+  }
+
+  function isCandle(zoneId, entity) {
+    const id = readUInt16LE(entity, 4)
+    if (id === 0xa001) {
+      const states = []
+      switch (zoneId) {
+      case ZONE.ST0:
+        states.push(0x20, 0x30, 0x80, 0x90)
+        break
+      case ZONE.ARE:
+        states.push(0x10)
+        break
+      case ZONE.CAT:
+        states.push(0x00, 0x10, 0x20)
+        break
+      case ZONE.CHI:
+        states.push(0x00, 0x10)
+        break
+      case ZONE.DAI:
+        states.push(0x00, 0x10)
+        break
+      case ZONE.LIB:
+        states.push(0x00)
+        break
+      case ZONE.NO0:
+        states.push(0x00, 0x10, 0x20, 0x80)
+        break
+      case ZONE.NO1:
+        states.push(0x50, 0x60)
+        break
+      case ZONE.NO2:
+        states.push(0x00, 0x10, 0x20, 0x30, 0x40, 0x60)
+        break
+      case ZONE.NO3:
+      case ZONE.NP3:
+        states.push(0x00)
+        break
+      case ZONE.NO4:
+        states.push(0x00, 0x50, 0x60)
+        break
+      case ZONE.NZ0:
+        states.push(0x00, 0x10, 0x20)
+        break
+      case ZONE.NZ1:
+        states.push(0x00, 0x10, 0x40, 0x50, 0x60)
+        break
+      case ZONE.TOP:
+        states.push(0x20, 0x30, 0x60)
+        break
+      case ZONE.RARE:
+        states.push(0x10)
+        break
+      case ZONE.RCAT:
+        states.push(0x00, 0x10, 0x20)
+        break
+      case ZONE.RCHI:
+        states.push(0x00, 0x10)
+        break
+      case ZONE.RDAI:
+        states.push(0x00, 0x10)
+        break
+      case ZONE.RLIB:
+        states.push(0x00)
+        break
+      case ZONE.RNO0:
+        states.push(0x00, 0x10, 0x20, 0x80)
+        break
+      case ZONE.RNO1:
+        states.push(0x50, 0x60)
+        break
+      case ZONE.RNO2:
+        states.push(0x00, 0x10, 0x20, 0x30, 0x40, 0x60)
+        break
+      case ZONE.RNO3:
+        states.push(0x00)
+        break
+      case ZONE.RNO4:
+        states.push(0x00, 0x50, 0x60)
+        break
+      case ZONE.RNZ0:
+        states.push(0x00, 0x10, 0x20)
+        break
+      case ZONE.RNZ1:
+        states.push(0x10, 0x40, 0x50, 0x60)
+        break
+      case ZONE.RTOP:
+        states.push(0x20, 0x30, 0x60)
+        break
+      }
+      if (states.indexOf(entity[9] & 0xf0) !== -1) {
+        return true
+      }
+    }
+  }
+
+  function getCandleEntities(zoneId, zone, rooms, offset, candles) {
+    for (let i = 0; i < rooms; i++) {
+      const ptr = readUInt32LE(zone, offset) - 0x80180000
+      let entitiy
+      let count = 0
+      do {
+        const p = ptr + 10 * count++
+        entity = zone.subarray(p, p + 10)
+        if (isCandle(zoneId, entity)) {
+          const candle = bufToHex(entity)
+          candles[i][candle] = candles[i][candle] || []
+          candles[i][candle].push(p)
+        }
+      } while (readUInt32LE(entity) != 0xffffffff)
+      offset += 4
+    }
+  }
+
+  function findCandleAddresses(zoneId, zone) {
+    // Get pointers to sorted tile layout structures.
+    let layout = readUInt32LE(zone, 0x10) - 0x80180000
+    let rooms = 0
+    while (zone[layout] != 0x40) {
+      rooms++
+      layout += 8
+    }
+    const enter = readUInt32LE(zone, 0x0c) - 0x80180000
+    const offX = readUInt16LE(zone, enter + 0x1c)
+    const offY = readUInt16LE(zone, enter + 0x28)
+    const candles = Array(rooms).fill(null).map(function() {
+      return {}
+    })
+    // Get candle data.
+    getCandleEntities(zoneId, zone, rooms, offX, candles)
+    getCandleEntities(zoneId, zone, rooms, offY, candles)
+    // Add candle data to item list.
+    candles.forEach(function(room) {
+      Object.getOwnPropertyNames(room).forEach(function(key) {
+        const entity = key.match(/[0-9a-f]{2}/g).map(function(byte) {
+          return parseInt(byte, 16)
+        })
+        let candle = entity[9]
+        let id = entity[8]
+        if (candle & 0x01) {
+          candle = candle & 0xf0
+          id = 0x0100 + id - 0x80
+        }
+        const item = itemFromId(id)
+        const addresses = room[key]
+        if (!item.tiles) {
+          item.tiles = []
+        }
+        item.tiles.push({
+          zone: zoneId,
+          addresses: addresses,
+          candle: candle,
+        })
+      })
+    })
   }
 
   function checkItemAddresses(data) {
@@ -267,7 +456,7 @@
         return {
           name: item.name,
           tile: Object.assign({}, tile, {
-            zone: zones[tile.zone],
+            zone: zoneNames[tile.zone],
             addresses: tile.addresses,
           }),
         }
@@ -275,7 +464,7 @@
     }))
     tiles.forEach(function(item) {
       item.tile.addresses.forEach(function(address) {
-        address = toHex(address, 8)
+        address = numToHex(address, 8)
         addresses[address] = addresses[address] || []
         const dup = Object.assign({}, item, {
           tile: Object.assign({}, item.tile),
@@ -340,76 +529,6 @@
     return true
   }
 
-  function zoneOffset(offset) {
-    return offset + Math.floor(offset / 0x800) * 0x130
-  }
-
-  function getCandleEntities(data, pos, offset, rooms, candleTypes, candles) {
-    for (let i = 0; i < rooms; i++) {
-      const ptr = data.readUInt32LE(pos + zoneOffset(offset)) - 0x80180000
-      let entitiy
-      let count = 0
-      do {
-        const p = pos + zoneOffset(ptr + 10 * count++)
-        entity = data.subarray(p, p + 10)
-        if (entity.readUInt16LE(4) === 0xa001
-            && candleTypes.indexOf(entity[9]) !== -1) {
-          const candle = Array.from(entity).map(function(byte) {
-            return ('00' + byte.toString(16)).slice(-2)
-          }).join('')
-          candles[i][candle] = candles[i][candle] || []
-          candles[i][candle].push(p)
-        }
-      } while (entity.readUInt32LE() != 0xffffffff)
-      offset += 4
-    }
-  }
-
-  function findCandleAddresses(zone, data, pos) {
-    let layout = data.readUInt32LE(pos + 0x10) - 0x80180000
-    let rooms = 0
-    while (data[pos + zoneOffset(layout)] != 0x40) {
-      rooms++
-      layout += 8
-    }
-    const enter = data.readUInt32LE(pos + 3 * 4) - 0x80180000
-    const offX = data.readUInt16LE(pos + zoneOffset(enter + 0x1c))
-    const offY = data.readUInt16LE(pos + zoneOffset(enter + 0x28))
-    const candles = Array(rooms).fill(null).map(function() {
-      return {}
-    })
-    const candleTypes = []
-    switch (zone) {
-    // case ZONE.LIB:
-    //   candleTypes.push(0x80)
-    //   break
-    default:
-      candleTypes.push(0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60)
-      break
-    }
-    getCandleEntities(data, pos, offX, rooms, candleTypes, candles)
-    getCandleEntities(data, pos, offY, rooms, candleTypes, candles)
-    candles.forEach(function(room) {
-      Object.getOwnPropertyNames(room).forEach(function(key) {
-        const entity = key.match(/[0-9a-f]{2}/g).map(function(byte) {
-          return parseInt(byte, 16)
-        })
-        const candle = entity[9]
-        const id = entity[8]
-        const item = itemFromId(id)
-        const addresses = room[key]
-        if (!item.tiles) {
-          item.tiles = []
-        }
-        item.tiles.push({
-          zone: zone,
-          addresses: addresses,
-          candle: candle,
-        })
-      })
-    })
-  }
-
   function checkItemLocations(data, verbose) {
     const mismatches = []
     items.forEach(function(item) {
@@ -420,19 +539,19 @@
             const value = tileValue(item, tile)
             const m = {
               name: item.name,
-              zone: zones[tile.zone],
-              address: toHex(address, 8)
+              zone: zoneNames[tile.zone],
+              address: numToHex(address, 8)
             }
             if (tile.byte) {
               found = (data[address] === value)
-              m.expected = toHex(value, 2)
-              m.actual = toHex(data[address], 2)
+              m.expected = numToHex(value, 2)
+              m.actual = numToHex(data[address], 2)
             } else {
               found = (data[address] === (value & 0xff))
                 && (data[address + 1] === (value >>> 8))
-              m.expected = toHex(value, 4)
+              m.expected = numToHex(value, 4)
               const actual = (data[address] << 8) + data[address + 1]
-              m.actual = toHex(actual, 4)
+              m.actual = numToHex(actual, 4)
             }
             if (!found) {
               mismatches.push(m)
@@ -534,17 +653,10 @@
         returnVal = checkItemLocations(data, options.verbose) && returnVal
       } else {
         // Find candle addresses.
-        // offsets.forEach(function(offset, zone) {
-        //   findCandleAddresses(zone, data, offset)
-        // })
-        // items.filter(function(item) {
-        //   return item.tiles && item.tiles.some(function(tile) {
-        //     return typeof(tile.candle) !== 'undefined'
-        //   })
-        // }).forEach(function(item) {
-        //   console.log(item)
-        // })
-        // Shuffle equipment by type.
+        //zones.forEach(function(zone, zoneId) {
+        //  findCandleAddresses(zoneId, restoreZone(data, zone.pos, zone.len))
+        //})
+        // Shuffle items by type.
         const shuffledTypes = shuffled(items).map(function(item) {
           item = Object.assign({}, item)
           delete item.tiles
@@ -593,8 +705,13 @@
           }
           return []
         })))
-        const tileItems = items.filter(function(item) {
-          return !shopFilter(item)
+        // Get placeable tiles.
+        const tileItems = items.map(function(item) {
+          return Object.assign({}, item, {
+            tiles: (item.tiles || []).filter(function(tile) {
+              return !tile.shop && !tile.tank
+            })
+          })
         })
         // Place tiles with the same type frequency as vanilla.
         // Equipment is unique and placed in non-despawn tiles.

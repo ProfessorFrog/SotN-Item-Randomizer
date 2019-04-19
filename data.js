@@ -6,25 +6,25 @@
   } catch (e) {}
 
   const TYPE = {
-    WEAPON1: 1,
-    WEAPON2: 2,
-    SHIELD: 3,
-    HELMET: 4,
-    ARMOR: 5,
-    CLOAK: 6,
-    ACCESSORY: 7,
-    USABLE: 8,
-    POWERUP: 9,
-    HEART: 10,
-    GOLD: 11,
-    SUBWEAPON: 12,
+    HEART: 0,
+    GOLD: 1,
+    SUBWEAPON: 2,
+    WEAPON1: 3,
+    WEAPON2: 4,
+    SHIELD: 5,
+    HELMET: 6,
+    ARMOR: 7,
+    CLOAK: 8,
+    ACCESSORY: 9,
+    USABLE: 10,
+    POWERUP: 11,
   }
 
   const ZONE = {
-    ST0:  0, // Final Stage: Bloodlines
+    ST0:  0,  // Final Stage: Bloodlines
     ARE:  1,  // Colosseum
     CAT:  2,  // Catacombs
-    CHI:  3,  // Abandoned Pit the Catacomb
+    CHI:  3,  // Abandoned Mine
     DAI:  4,  // Royal Chapel
     LIB:  5,  // Long Library
     NO0:  6,  // Marble Gallery
@@ -52,36 +52,91 @@
   }
 
   // Offsets in the bin of each zone file.
-  const offsets = [
-    0x0533efc8, // ZONE.ST0
-    0x043c2018, // ZONE.ARE
-    0x0448f938, // ZONE.CAT
-    0x045e8ae8, // ZONE.CHI
-    0x04675f08, // ZONE.DAI
-    0x047a1ae8, // ZONE.LIB
-    0x048f9a38, // ZONE.NO0
-    0x049d18b8, // ZONE.NO1
-    0x04aa0438, // ZONE.NO2
-    0x04b665e8, // ZONE.NO3
-    0x053f4708, // ZONE.NP3
-    0x04c307e8, // ZONE.NO4
-    0x054b0c88, // ZONE.NZ0
-    0x055724b8, // ZONE.NZ1
-    0x0560e7b8, // ZONE.TOP
-    0x057509e8, // ZONE.RARE
-    0x04cfa0b8, // ZONE.RCAT
-    0x04aa0438, // ZONE.RCHI
-    0x04e31458, // ZONE.RDAI
-    0x04ee2218, // ZONE.RLIB
-    0x04f84a28, // ZONE.RNO0
-    0x0504f558, // ZONE.RNO1
-    0x050f7948, // ZONE.RNO2
-    0x051ac758, // ZONE.RNO3
-    0x0526a868, // ZONE.RNO4
-    0x05902278, // ZONE.RNZ0
-    0x059bb0d8, // ZONE.RNZ1
-    0x057df998, // ZONE.RTOP
-  ]
+  const zones = [{
+    // ZONE.ST0
+    pos: 0x0533efc8, len: 271812, 
+  }, {
+    // ZONE.ARE
+    pos: 0x043c2018, len: 352636,
+  }, {
+    // ZONE.CAT
+    pos: 0x0448f938, len: 361920,
+  }, {
+    // ZONE.CHI
+    pos: 0x045e8ae8, len: 193576,
+  }, {
+    // ZONE.DAI
+    pos: 0x04675f08, len: 373764,
+  }, {
+    // ZONE.LIB
+    pos: 0x047a1ae8, len: 348876,
+  }, {
+    // ZONE.NO0
+    pos: 0x048f9a38, len: 390540,
+  }, {
+    // ZONE.NO1
+    pos: 0x049d18b8, len: 356452,
+  }, {
+    // ZONE.NO2
+    pos: 0x04aa0438, len: 327100,
+  }, {
+    // ZONE.NO3
+    pos: 0x04b665e8, len: 359960,
+  }, {
+    // ZONE.NP3
+    pos: 0x053f4708, len: 341044,
+  }, {
+    // ZONE.NO4
+    pos: 0x04c307e8, len: 391260,
+  }, {
+    // ZONE.NZ0
+    pos: 0x054b0c88, len: 309120,
+  }, {
+    // ZONE.NZ1
+    pos: 0x055724b8, len: 271168,
+  }, {
+    // ZONE.TOP
+    pos: 0x0560e7b8, len: 247132,
+  }, {
+    // ZONE.RARE
+    pos: 0x057509e8, len: 234384,
+  }, {
+    // ZONE.RCAT
+    pos: 0x04cfa0b8, len: 278188,
+  }, {
+    // ZONE.RCHI
+    pos: 0x04da4968, len: 174880,
+  }, {
+    // ZONE.RDAI
+    pos: 0x04e31458, len: 295736,
+  }, {
+    // ZONE.RLIB
+    pos: 0x04ee2218, len: 201776,
+  }, {
+    // ZONE.RNO0
+    pos: 0x04f84a28, len: 347020,
+  }, {
+    // ZONE.RNO1
+    pos: 0x0504f558, len: 357020,
+  }, {
+    // ZONE.RNO2
+    pos: 0x050f7948, len: 313816,
+  }, {
+    // ZONE.RNO3
+    pos: 0x051ac758, len: 304428,
+  }, {
+    // ZONE.RNO4
+    pos: 0x0526a868, len: 384020,
+  }, {
+    // ZONE.RNZ0
+    pos: 0x05902278, len: 281512,
+  }, {
+    // ZONE.RNZ1
+    pos: 0x059bb0d8, len: 260960,
+  }, {
+    // ZONE.RTOP
+    pos: 0x057df998, len: 200988,
+  }]
 
   const items = [{
     name: 'Heart',
@@ -135,38 +190,117 @@
     name: 'Dagger',
     type: TYPE.SUBWEAPON,
     id: 14,
+    tiles: [{
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883c4 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Axe',
     type: TYPE.SUBWEAPON,
     id: 15,
+    tiles: [{
+      zone: ZONE.NZ0,
+      addresses: [ 0x054b372c ],
+      byte: true,
+      tank: true,
+    }, {
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883d0 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Cross',
     type: TYPE.SUBWEAPON,
     id: 16,
+    tiles: [{
+      zone: ZONE.NZ0,
+      addresses: [ 0x054b371c ],
+      byte: true,
+      tank: true,
+    }, {
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883c0 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Holy Water',
     type: TYPE.SUBWEAPON,
     id: 17,
+    tiles: [{
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883d4 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Stopwatch',
     type: TYPE.SUBWEAPON,
     id: 18,
+    tiles: [{
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883d8 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Bible',
     type: TYPE.SUBWEAPON,
     id: 19,
+    tiles: [{
+      zone: ZONE.NZ0,
+      addresses: [ 0x054b3724 ],
+      byte: true,
+      tank: true,
+    }, {
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883c8 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Rebound Stone',
     type: TYPE.SUBWEAPON,
     id: 20,
+    tiles: [{
+      zone: ZONE.NZ0,
+      addresses: [ 0x054b3718 ],
+      byte: true,
+      tank: true,
+    }, {
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883bc ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Vibhuti',
     type: TYPE.SUBWEAPON,
     id: 21,
+    tiles: [{
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883cc ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Agunea',
     type: TYPE.SUBWEAPON,
     id: 22,
+    tiles: [{
+      zone: ZONE.NZ0,
+      addresses: [ 0x054b3714 ],
+      byte: true,
+      tank: true,
+    }, {
+      zone: ZONE.RNZ0,
+      addresses: [ 0x04f883b8 ],
+      byte: true,
+      tank: true,
+    }],
   }, {
     name: 'Heart Vessel',
     type: TYPE.POWERUP,
@@ -2651,7 +2785,7 @@
   const data = {
     TYPE: TYPE,
     ZONE: ZONE,
-    offsets: offsets,
+    zones: zones,
     items: items,
   }
 
