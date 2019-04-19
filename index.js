@@ -68,9 +68,10 @@
     })[0]
   }
 
-  function itemFromId(id) {
+  function itemFromId(id, types) {
     return items.filter(function(item) {
       return item.id === id
+        && (typeof(types) === 'undefined' || types.indexOf(item.type) !== -1)
     })[0]
   }
 
@@ -322,7 +323,7 @@
         expected += equipIdOffset
       }
       if (actual !== expected) {
-        mismatches.push(itemFromId(actual).name)
+        mismatches.push(itemFromId(actual, [equipment[i].type]).name)
       }
     }
     if (mismatches.length) {
