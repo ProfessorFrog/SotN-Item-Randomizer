@@ -344,7 +344,7 @@
     return offset + Math.floor(offset / 0x800) * 0x130
   }
 
-  function getCandleEntities(data, pos, offset, rooms, candles) {
+  function getCandleEntities(data, pos, offset, rooms, candleTypes, candles) {
     for (let i = 0; i < rooms; i++) {
       const ptr = data.readUInt32LE(pos + zoneOffset(offset)) - 0x80180000
       let entitiy
@@ -352,8 +352,8 @@
       do {
         const p = pos + zoneOffset(ptr + 10 * count++)
         entity = data.subarray(p, p + 10)
-        if (entity.readUInt16LE(4) === 0xa001 &&
-            !(entity[9] & 0x0f) && entity[9] < 0x80) {
+        if (entity.readUInt16LE(4) === 0xa001
+            && candleTypes.indexOf(entity[9]) !== -1) {
           const candle = Array.from(entity).map(function(byte) {
             return ('00' + byte.toString(16)).slice(-2)
           }).join('')
@@ -378,8 +378,17 @@
     const candles = Array(rooms).fill(null).map(function() {
       return {}
     })
-    getCandleEntities(data, pos, offX, rooms, candles)
-    getCandleEntities(data, pos, offY, rooms, candles)
+    const candleTypes = []
+    switch (zone) {
+    // case ZONE.LIB:
+    //   candleTypes.push(0x80)
+    //   break
+    default:
+      candleTypes.push(0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60)
+      break
+    }
+    getCandleEntities(data, pos, offX, rooms, candleTypes, candles)
+    getCandleEntities(data, pos, offY, rooms, candleTypes, candles)
     candles.forEach(function(room) {
       Object.getOwnPropertyNames(room).forEach(function(key) {
         const entity = key.match(/[0-9a-f]{2}/g).map(function(byte) {
@@ -525,9 +534,16 @@
         returnVal = checkItemLocations(data, options.verbose) && returnVal
       } else {
         // Find candle addresses.
-        offsets.forEach(function(offset, zone) {
-          findCandleAddresses(zone, data, offset)
-        })
+        // offsets.forEach(function(offset, zone) {
+        //   findCandleAddresses(zone, data, offset)
+        // })
+        // items.filter(function(item) {
+        //   return item.tiles && item.tiles.some(function(tile) {
+        //     return typeof(tile.candle) !== 'undefined'
+        //   })
+        // }).forEach(function(item) {
+        //   console.log(item)
+        // })
         // Shuffle equipment by type.
         const shuffledTypes = shuffled(items).map(function(item) {
           item = Object.assign({}, item)
