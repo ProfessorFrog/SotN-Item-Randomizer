@@ -662,27 +662,25 @@
     }).reduce(typeReduce, [])
     // Assign random shop addresses.
     const shuffledTypes = shuffled(itemDescriptions).reduce(typeReduce, [])
-    shopTypes.forEach(function(items) {
-      if (Array.isArray(items)) {
-        items.forEach(function(to) {
-          let from
-          for (let i = 0; i < shuffledTypes[to.type].length; i++) {
-            from = shuffledTypes[to.type][i]
-            // You can't buy food from the shop.
-            if (foodFilter(from)) {
-              continue
-            }
-            // Selling salable items could result in infinite gold.
-            if (salableFilter(from)) {
-              continue
-            }
-            shuffledTypes[to.type].splice(i, 1)
-            break
+    shopTypes.forEach(function(items, type) {
+      (items || []).forEach(function(from) {
+        let to
+        for (let i = 0; i < shuffledTypes[type].length; i++) {
+          to = shuffledTypes[type][i]
+          // You can't buy food from the shop.
+          if (foodFilter(to)) {
+            continue
           }
-          to.name = from.name
-          to.id = from.id
-        })
-      }
+          // Selling salable items could result in infinite gold.
+          if (salableFilter(to)) {
+            continue
+          }
+          shuffledTypes[type].splice(i, 1)
+          break
+        }
+        to.tiles = to.tiles || []
+        Array.prototype.push.apply(to.tiles, from.tiles)
+      })
     })
   }
 
