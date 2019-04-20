@@ -529,6 +529,10 @@
     writeShort(data, 0x119764, cloakInvOffset)
     writeShort(data, 0x1197b0, accessoryInvOffset)
     writeShort(data, 0x1197c4, accessoryInvOffset)
+    // Replace Axe Lord Armor with a random armor.
+    data[0x11a230] = randItem(items.filter(armorFilter)).id + equipIdOffset
+    // Replace Lapis Lazuli with a random accessory.
+    data[0x11a198] = randItem(items.filter(accessoryFilter)).id + equipIdOffset
     // Update info.
     info[2]['Starting equipment'] = [
       weapon.name,
