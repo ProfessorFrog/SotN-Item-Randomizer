@@ -639,7 +639,6 @@
         TYPE.HEART,
         TYPE.GOLD,
         TYPE.SUBWEAPON,
-        TYPE.POWERUP,
       ])))
       while (tankZones[zone].length) {
         pushTile(items.pop(), takeTile(tankZones[zone]))
