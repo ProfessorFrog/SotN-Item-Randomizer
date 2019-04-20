@@ -9,15 +9,15 @@
     HEART: 0,
     GOLD: 1,
     SUBWEAPON: 2,
-    WEAPON1: 3,
-    WEAPON2: 4,
-    SHIELD: 5,
-    HELMET: 6,
-    ARMOR: 7,
-    CLOAK: 8,
-    ACCESSORY: 9,
-    USABLE: 10,
-    POWERUP: 11,
+    POWERUP: 3,
+    WEAPON1: 4,
+    WEAPON2: 5,
+    SHIELD: 6,
+    HELMET: 7,
+    ARMOR: 8,
+    CLOAK: 9,
+    ACCESSORY: 10,
+    USABLE: 11,
   }
 
   const ZONE = {
@@ -182,10 +182,6 @@
     name: '$2000',
     type: TYPE.GOLD,
     id: 10,
-  }, {
-    name: '$5000',
-    type: TYPE.GOLD,
-    id: 11,
   }, {
     name: 'Dagger',
     type: TYPE.SUBWEAPON,
