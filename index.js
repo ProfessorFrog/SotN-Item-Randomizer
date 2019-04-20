@@ -608,9 +608,9 @@
     const rewardTiles = collectTiles(items, function(tile) {
       return tile.reward
     })
-    const usableItems = itemDescriptions.filter(usableFilter)
+    const usableItems = shuffled(itemDescriptions.filter(usableFilter))
     while (rewardTiles.length) {
-      const item = randItem(usableItems)
+      const item = usableItems.pop()
       item.tiles = item.tiles || []
       item.tiles.push(rewardTiles.pop())
     }
