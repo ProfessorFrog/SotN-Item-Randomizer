@@ -655,7 +655,7 @@
     // Assign random shop addresses.
     const shuffledTypes = shuffled(itemDescriptions.filter(function(item) {
       return !foodFilter(item) && !salableFilter(item)
-    }).reduce(typeReduce, [])
+    }).reduce(typeReduce, []))
     shopTypes.forEach(function(items, type) {
       (items || []).map(function(item) {
         return tiles
