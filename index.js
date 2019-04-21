@@ -120,9 +120,6 @@
   }
 
   function typeReduce(types, item) {
-    if (!types) {
-      types = []
-    }
     if (!types[item.type]) {
       types[item.type] = []
     }
@@ -161,10 +158,9 @@
   }
 
   function pushTile() {
-    const item = arguments[0]
-    const tiles = Array.prototype.slice.call(arguments, 1)
-    item.tiles = item.tiles || []
-    Array.prototype.push.apply(item.tiles, tiles)
+    const tiles = Array.prototype.slice.call(arguments, 0)
+    this.tiles = this.tiles || []
+    Array.prototype.push.apply(this.tiles, tiles)
   }
 
   function tileCountReduce(count, item) {
@@ -575,7 +571,7 @@
       specials[name].forEach(function(item) {
         let replacement
         do replacement = itemTypes[item.type].pop()
-        while (replacement.food)
+        while (foodFilter(replacement))
         const tiles = collectTiles([item], candleTileFilter)
         pushTile.apply(replacement, tiles)
       })
@@ -597,7 +593,7 @@
       item = itemFromId(item.id, typeFilter([item.type]), itemDescriptions)
       let count = candleTileCounts[index]
       while (count--) {
-        pushTile(item, candleTiles.pop())
+        pushTile.call(item, candleTiles.pop())
       }
     })
   }
@@ -608,7 +604,7 @@
     })
     const usableItems = shuffled(itemDescriptions.filter(usableFilter))
     while (rewardTiles.length) {
-      pushTile(usableItems.pop(), rewardTiles.pop())
+      pushTile.call(usableItems.pop(), rewardTiles.pop())
     }
   }
 
@@ -633,7 +629,7 @@
     Object.getOwnPropertyNames(tankZones).forEach(function(zone) {
       const subweapons = shuffled(itemDescriptions.filter(subweaponFilter))
       while (tankZones[zone].length) {
-        pushTile(subweapons.pop(), tankZones[zone].pop())
+        pushTile.call(subweapons.pop(), tankZones[zone].pop())
       }
     })
   }
@@ -655,12 +651,12 @@
     // Assign random shop addresses.
     const shuffledTypes = shuffled(itemDescriptions.filter(function(item) {
       return !foodFilter(item) && !salableFilter(item)
-    }).reduce(typeReduce, []))
+    })).reduce(typeReduce, [])
     shopTypes.forEach(function(items, type) {
       (items || []).map(function(item) {
         return item.tiles
       }).forEach(function(tiles) {
-        pushTile.apply(null, shuffledTypes[type].pop().tiles, tiles)
+        pushTile.apply(shuffledTypes[type].pop(), tiles)
       })
     })
   }
@@ -692,13 +688,13 @@
     equipment.forEach(function(filter) {
       eachTileItem(tileItems, shuffledItems, filter, function(items) {
         const item = items.pop()
-        pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
+        pushTile.call(item, takePermaTile(shuffledTiles, blacklist(item)))
       })
     })
     // Powerups are in multiple non-despawn tiles.
     eachTileItem(tileItems, shuffledItems, powerupFilter, function(items) {
       const item = randItem(items)
-      pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
+      pushTile.call(item, takePermaTile(shuffledTiles, blacklist(item)))
     })
     // Distribute jewels with same frequency as vanilla.
     const salableItems = items.filter(salableFilter)
@@ -707,7 +703,7 @@
         return item.id === salableItem.id
       }, function(items) {
         const item = items[0]
-        pushTile(item, takePermaTile(shuffledTiles, blacklist(item)))
+        pushTile.call(item, takePermaTile(shuffledTiles, blacklist(item)))
       })
     })
     // Usable items can occupy multiple (possibly despawn) tiles.
@@ -715,7 +711,7 @@
     usable.forEach(function(filter) {
       eachTileItem(tileItems, shuffledItems, filter, function(items) {
         const item = randItem(items)
-        pushTile(item, takeTile(shuffledTiles, blacklist(item)))
+        pushTile.call(item, takeTile(shuffledTiles, blacklist(item)))
       })
     })
   }
