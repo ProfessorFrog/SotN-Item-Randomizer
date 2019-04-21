@@ -160,11 +160,11 @@
     })
   }
 
-  function pushTile(item, tile) {
-    if (!Array.isArray(item.tiles)) {
-      item.tiles = []
-    }
-    item.tiles.push(tile)
+  function pushTile() {
+    const item = arguments[0]
+    const tiles = Array.prototype.slice.call(arguments, 1)
+    item.tiles = item.tiles || []
+    Array.prototype.push.apply(item.tiles, tiles)
   }
 
   function tileCountReduce(count, item) {
@@ -577,8 +577,7 @@
         do replacement = itemTypes[item.type].pop()
         while (replacement.food)
         const tiles = collectTiles([item], candleTileFilter)
-        replacement.tiles = replacement.tiles || []
-        Array.prototype.push.apply(replacement.tiles, tiles)
+        pushTile.apply(replacement, tiles)
       })
     })
     // Randomize the rest of the candles, except for Final Stage, which
@@ -598,8 +597,7 @@
       item = itemFromId(item.id, typeFilter([item.type]), itemDescriptions)
       let count = candleTileCounts[index]
       while (count--) {
-        item.tiles = item.tiles || []
-        item.tiles.push(candleTiles.pop())
+        pushTile(item, candleTiles.pop())
       }
     })
   }
@@ -610,9 +608,7 @@
     })
     const usableItems = shuffled(itemDescriptions.filter(usableFilter))
     while (rewardTiles.length) {
-      const item = usableItems.pop()
-      item.tiles = item.tiles || []
-      item.tiles.push(rewardTiles.pop())
+      pushTile(usableItems.pop(), rewardTiles.pop())
     }
   }
 
@@ -635,13 +631,9 @@
     })
     // Randomize tank items.
     Object.getOwnPropertyNames(tankZones).forEach(function(zone) {
-      const items = shuffled(itemDescriptions.filter(typeFilter([
-        TYPE.HEART,
-        TYPE.GOLD,
-        TYPE.SUBWEAPON,
-      ])))
+      const subweapons = shuffled(itemDescriptions.filter(subweaponFilter))
       while (tankZones[zone].length) {
-        pushTile(items.pop(), takeTile(tankZones[zone]))
+        pushTile(subweapons.pop(), tankZones[zone].pop())
       }
     })
   }
@@ -661,25 +653,14 @@
       }
     }).reduce(typeReduce, [])
     // Assign random shop addresses.
-    const shuffledTypes = shuffled(itemDescriptions).reduce(typeReduce, [])
+    const shuffledTypes = shuffled(itemDescriptions.filter(function(item) {
+      return !foodFilter(item) && !salableFilter(item)
+    }).reduce(typeReduce, [])
     shopTypes.forEach(function(items, type) {
-      (items || []).forEach(function(from) {
-        let to
-        for (let i = 0; i < shuffledTypes[type].length; i++) {
-          to = shuffledTypes[type][i]
-          // You can't buy food from the shop.
-          if (foodFilter(to)) {
-            continue
-          }
-          // Selling salable items could result in infinite gold.
-          if (salableFilter(to)) {
-            continue
-          }
-          shuffledTypes[type].splice(i, 1)
-          break
-        }
-        to.tiles = to.tiles || []
-        Array.prototype.push.apply(to.tiles, from.tiles)
+      (items || []).map(function(item) {
+        return tiles
+      }).forEach(function(tiles) {
+        pushTile.apply(null, shuffledTypes[type].pop().tiles, tiles)
       })
     })
   }
@@ -730,10 +711,7 @@
       })
     })
     // Usable items can occupy multiple (possibly despawn) tiles.
-    const usable = [
-      usableFilter,
-      foodFilter,
-    ]
+    const usable = [ usableFilter, foodFilter ]
     usable.forEach(function(filter) {
       eachTileItem(tileItems, shuffledItems, filter, function(items) {
         const item = randItem(items)
