@@ -685,7 +685,7 @@
   }
 
   function randomizeMapItems(itemDescriptions) {
-    // Shuffle shop items back into item list.
+    // Shuffle items.
     const shuffledItems = shuffled(itemDescriptions)
     // Get all map tiles.
     const tileItems = items.map(function(item) {
