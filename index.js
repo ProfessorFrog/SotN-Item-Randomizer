@@ -658,7 +658,7 @@
     }).reduce(typeReduce, []))
     shopTypes.forEach(function(items, type) {
       (items || []).map(function(item) {
-        return tiles
+        return item.tiles
       }).forEach(function(tiles) {
         pushTile.apply(null, shuffledTypes[type].pop().tiles, tiles)
       })
