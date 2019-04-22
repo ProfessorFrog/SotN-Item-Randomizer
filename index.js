@@ -598,7 +598,7 @@
     })
   }
 
-  function randomizeRewardItems(itemDescriptions) {
+  function randomizePrologueRewards(itemDescriptions) {
     const rewardTiles = collectTiles(items, function(tile) {
       return tile.reward
     })
@@ -776,7 +776,7 @@
       let expected = equipment[i].id
       let actual = data[equipBaseAddress + i * 12]
       if (i > 1) {
-        expected += equipIdOffset
+        actual -= equipIdOffset
       }
       if (actual !== expected) {
         const item = itemFromId(actual, typeFilter([equipment[i].type]))
@@ -789,6 +789,7 @@
         mismatches.forEach(function(item) {
           console.error(item)
         })
+        console.error('starting equipment is NOT vanilla:')
       }
       return false
     } else if (verbose) {
@@ -797,18 +798,22 @@
     return true
   }
 
-  function checkItemLocations(data, verbose) {
-    const mismatches = []
-    items.forEach(function(item) {
+  function checkAddresses(data, tileFilter) {
+    if (!tileFilter) {
+      tileFilter = function() {
+        return true
+      }
+    }
+    return function(mismatches, item) {
       if (item.tiles) {
-        item.tiles.forEach(function(tile) {
+        item.tiles.filter(tileFilter).forEach(function(tile) {
           tile.addresses.forEach(function(address) {
             let found
             const value = tileValue(item, tile)
             const m = {
               name: item.name,
               zone: zoneNames[tile.zone],
-              address: numToHex(address, 8)
+              address: numToHex(address, 8),
             }
             if (tile.byte) {
               found = (data[address] === value)
@@ -827,17 +832,44 @@
           })
         })
       }
-    })
+      return mismatches
+    }
+  }
+
+  function checkItemLocations(data, verbose) {
+    const mismatches = items.reduce(checkAddresses(data, function(tile) {
+      return !tile.reward
+    }), [])
     if (mismatches.length) {
       if (verbose) {
-        console.error('item mismatches:')
+        console.error('item location mismatches:')
         mismatches.forEach(function(item) {
           console.error(item)
         })
+        console.error('item locations are NOT vanilla')
       }
       return false
     } else if (verbose) {
       console.log('item locations are vanilla')
+    }
+    return true
+  }
+
+  function checkPrologueRewards(data, verbose) {
+    const mismatches = items.reduce(checkAddresses(data, function(tile) {
+      return tile.reward
+    }), [])
+    if (mismatches.length) {
+      if (verbose) {
+        console.error('prologue reward mismatches:')
+        mismatches.forEach(function(item) {
+          console.error(item)
+        })
+        console.error('prologue rewards are NOT vanilla')
+      }
+      return false
+    } else if (verbose) {
+      console.log('prologue rewards are vanilla')
     }
     return true
   }
@@ -858,6 +890,12 @@
         randomizeStartingEquipment(data, info)
       }
     }
+    // Get item descriptions.
+    const itemDescriptions = items.map(function(item) {
+      item = Object.assign({}, item)
+      delete item.tiles
+      return item
+    })
     // Randomize item locations.
     if (options.itemLocations) {
       // Run a sanity check.
@@ -865,12 +903,6 @@
         // Check for item locations.
         returnVal = checkItemLocations(data, options.verbose) && returnVal
       } else {
-        // Get item descriptions.
-        const itemDescriptions = items.map(function(item) {
-          item = Object.assign({}, item)
-          delete item.tiles
-          return item
-        })
         // Find candle addresses.
         zones.forEach(function(zone, zoneId) {
           findCandleAddresses(zoneId, data, zone.pos, zone.len)
@@ -879,19 +911,28 @@
         randomizeCandles(itemDescriptions)
         // Randomize tank items.
         randomizeTankItems(itemDescriptions)
-        // Randomize reward items.
-        randomizeRewardItems(itemDescriptions)
         // Randomize shop items.
         randomizeShopItems(itemDescriptions)
         // Randomize map items.
         randomizeMapItems(itemDescriptions)
-        // Write items to ROM.
-        itemDescriptions.filter(tilesFilter).forEach(writeTiles(data))
       }
+    }
+    if (options.prologueRewards) {
+      // Run a sanity check.
+      if (options.checkVanilla) {
+        // Check for item locations.
+        returnVal = checkPrologueRewards(data, options.verbose) && returnVal
+      } else {
+        // Randomize reward items.
+        randomizePrologueRewards(itemDescriptions)
+      }
+    }
+    if (!options.checkVanilla) {
+      // Write items to ROM.
+      itemDescriptions.filter(tilesFilter).forEach(writeTiles(data))
     }
     return returnVal
   }
-
   if (isNode) {
     module.exports = randomizeItems
   } else {
