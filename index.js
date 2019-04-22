@@ -608,7 +608,7 @@
     }
   }
 
-  function randomizeTankItems(itemDescriptions) {
+  function randomizeSubweaponTanks(itemDescriptions) {
     // Get subweapon tank tiles.
     const tankTiles = flattened(items.filter(function(item) {
       return item.tiles && item.tiles.some(function(tile) {
@@ -631,6 +631,17 @@
       while (tankZones[zone].length) {
         pushTile.call(subweapons.pop(), tankZones[zone].pop())
       }
+    })
+  }
+
+  function turkeyMode(itemDescriptions) {
+    itemDescriptions.push({
+      name: 'Turkey',
+      type: TYPE.SUBWEAPON,
+      id: 13,
+      tiles: collectTiles(items, function(tile) {
+        return tile.tank
+      }),
     })
   }
 
@@ -910,13 +921,16 @@
         // Randomize candles.
         randomizeCandles(itemDescriptions)
         // Randomize tank items.
-        randomizeTankItems(itemDescriptions)
+        if (!options.turkeyMode) {
+          randomizeSubweaponTanks(itemDescriptions)
+        }
         // Randomize shop items.
         randomizeShopItems(itemDescriptions)
         // Randomize map items.
         randomizeMapItems(itemDescriptions)
       }
     }
+    // Randomize prologue rewards.
     if (options.prologueRewards) {
       // Run a sanity check.
       if (options.checkVanilla) {
@@ -927,8 +941,12 @@
         randomizePrologueRewards(itemDescriptions)
       }
     }
+    // Turkey mode.
+    if (options.turkeyMode) {
+      turkeyMode(itemDescriptions)
+    }
+    // Write items to ROM.
     if (!options.checkVanilla) {
-      // Write items to ROM.
       itemDescriptions.filter(tilesFilter).forEach(writeTiles(data))
     }
     return returnVal
